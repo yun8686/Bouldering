@@ -1,5 +1,10 @@
 
+import 'package:bouldering_sns/Setting/ContactWidget.dart';
 import 'package:bouldering_sns/Setting/HowToUseWidget.dart';
+import 'package:bouldering_sns/Setting/LocationSettingWidget.dart';
+import 'package:bouldering_sns/Setting/NoticeSettingWidget.dart';
+import 'package:bouldering_sns/Setting/PrivacyPolicyWidget.dart';
+import 'package:bouldering_sns/Setting/TermsOfServiceWidget.dart';
 import 'package:flutter/material.dart';
 
 class SettingWidget extends StatelessWidget {
@@ -18,16 +23,15 @@ class SettingWidget extends StatelessWidget {
     );
   }
 
-  //TODO: 各ウィジェット作る
   Widget _buildList(BuildContext context) => ListView(
     children: [
       _tile('使い方ガイド', context, new HowToUseWidget()),
-      _tile('通知設定', context, new HowToUseWidget()),
-      _tile('位置情報', context, new HowToUseWidget()),
+      _tile('通知設定', context, new NoticeSettingWidget()),
+      _tile('位置情報', context, new LocationSettingWidget()),
       Divider(),
-      _tile('利用規約', context, new HowToUseWidget()),
-      _tile('お問い合わせ', context, new HowToUseWidget()),
-      _tile('プライバシーポリシー', context, new HowToUseWidget()),
+      _tile('利用規約', context, new TermsOfServiceWidget()),
+      _tile('お問い合わせ', context, new ContactWidget()),
+      _tile('プライバシーポリシー', context, new PrivacyPolicyWidget()),
     ],
   );
 
