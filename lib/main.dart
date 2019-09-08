@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
 
+import 'package:bouldering_sns/Friends/FriendsWidget.dart';
 import 'package:bouldering_sns/camera/camera.dart';
 import 'package:bouldering_sns/Setting/SettingWidget.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +45,7 @@ class _MyImagePageState extends State<MyImagePage> {
 //      appBar: AppBar(
 //        title: Text("Camera App!"),
 //      ),
-      body: _selectedIndex==3?SettingWidget():null,
+      body: SafeArea(child: getPageWidget(_selectedIndex)) ,
       bottomNavigationBar: new BottomNavigationBar(
         items: [
           new BottomNavigationBarItem(
@@ -80,6 +81,16 @@ class _MyImagePageState extends State<MyImagePage> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  Widget getPageWidget(int idx){
+    switch(idx){
+      case 3:
+        return SettingWidget();
+      case 2:
+        return FriendsWidget();
+    }
+    return SettingWidget();
   }
 
   void getImage() async {
