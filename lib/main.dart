@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'dart:typed_data';
 
 import 'package:bouldering_sns/camera/camera.dart';
+import 'package:bouldering_sns/Setting/SettingWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
 import 'package:image_picker/image_picker.dart';
@@ -43,22 +44,23 @@ class _MyImagePageState extends State<MyImagePage> {
 //      appBar: AppBar(
 //        title: Text("Camera App!"),
 //      ),
+      body: _selectedIndex==3?SettingWidget():null,
       bottomNavigationBar: new BottomNavigationBar(
         items: [
           new BottomNavigationBarItem(
-            icon: const Icon(Icons.star),
+            icon: const Icon(Icons.home),
             title: new Text('Home'),
           ),
           new BottomNavigationBarItem(
-            icon: const Icon(Icons.star),
+            icon: const Icon(Icons.assistant_photo),
             title: new Text('Task'),
           ),
           new BottomNavigationBarItem(
-            icon: const Icon(Icons.star),
+            icon: const Icon(Icons.chat),
             title: new Text('Friends'),
           ),
           new BottomNavigationBarItem(
-            icon: const Icon(Icons.star),
+            icon: const Icon(Icons.account_box),
             title: new Text('Setting'),
           )
         ],
