@@ -1,4 +1,5 @@
 import 'package:bouldering_sns/Library/SharedPreferences.dart';
+import 'package:bouldering_sns/SplashScreen/SplashWidget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,9 @@ class _AuthEntranceState extends State<AuthEntranceWedget> {
     });
     await MySharedPreferences.setFirebaseUID(user.uid);
     print(username);
+    Navigator.of(context).pushReplacement(new MaterialPageRoute(
+      builder: (BuildContext context) => SplashWidget(),
+    ));
     return user;
   }
 
