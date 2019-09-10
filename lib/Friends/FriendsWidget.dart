@@ -43,55 +43,58 @@ class FriendsWidgetState extends State<FriendsWidget> {
   List<Widget> getFriendsWidgets() {
     List<Widget> widgets = new List<Widget>();
     if (this.showSearchArea) widgets.add(searchAreaText());
-    widgets.add(
-        Expanded(
-          child: Container(
+    widgets.add(Expanded(
+      child: Container(
+          child: RefreshIndicator(
+              onRefresh: _onRefresh,
               child: new ListView(
                 children: userList("たかしくん"),
-              )
-          ),
-        )
-    );
+              ))),
+    ));
     return widgets;
   }
 
   List<Widget> getNearByWidgets() {
     List<Widget> widgets = new List<Widget>();
     if (this.showSearchArea) widgets.add(searchAreaText());
-    widgets.add(
-        Expanded(
-          child: Container(
+    widgets.add(Expanded(
+      child: Container(
+          child: RefreshIndicator(
+              onRefresh: _onRefresh,
               child: new ListView(
                 children: userList("けんじくん"),
-              )
-          ),
-        )
-    );
+              ))),
+    ));
     return widgets;
   }
 
-
-  List<Widget> userList(String name){
+  List<Widget> userList(String name) {
     List<Widget> users = new List<Widget>();
-    for(int i=1;i<=100;i++){
-      users.add(
-          new ListTile(
-            leading: new CircleAvatar(
-              backgroundImage: new NetworkImage("https://booth.pximg.net/c3d42cdb-5e97-43ff-9331-136453807f10/i/616814/d7def86b-1d95-4f2d-ad9c-c0c218e6a533_base_resized.jpg"),
-            ),
-            title: new Text(name + i.toString()),
-            onTap: (){
-              Navigator.push(
-                  context,
-                  new MaterialPageRoute<Null>(
-                    builder: (BuildContext context) => new ChatWidget(name + i.toString()),
-                  ));
-
-            },
-          )
-      );
+    for (int i = 1; i <= 100; i++) {
+      users.add(new ListTile(
+        leading: new CircleAvatar(
+          backgroundImage: new NetworkImage(
+              "https://booth.pximg.net/c3d42cdb-5e97-43ff-9331-136453807f10/i/616814/d7def86b-1d95-4f2d-ad9c-c0c218e6a533_base_resized.jpg"),
+        ),
+        title: new Text(name + i.toString()),
+        onTap: () {
+          Navigator.push(
+              context,
+              new MaterialPageRoute<Null>(
+                builder: (BuildContext context) =>
+                    new ChatWidget(name + i.toString()),
+              ));
+        },
+      ));
     }
     return users;
+  }
+
+  //
+  Future<void> _onRefresh() async {
+    setState(() {
+      this.showSearchArea = true;
+    });
   }
 
   TextField searchAreaText() {

@@ -26,6 +26,10 @@ dependencies:
   permission_handler: any
   firebase_core: any
   firebase_storage: any
+  firebase_auth: any
+  splashscreen: any
+  google_sign_in: any
+  shared_preferences: any
 
 dev_dependencies:
   flutter_test:
