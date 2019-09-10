@@ -27,6 +27,7 @@ dependencies:
   firebase_core: any
   firebase_storage: any
   firebase_auth: any
+  cloud_firestore: any
   splashscreen: any
   google_sign_in: any
   shared_preferences: any

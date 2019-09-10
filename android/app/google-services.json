@@ -1,34 +1,42 @@
 {
   "project_info": {
-    "project_number": "1001661432737",
-    "firebase_url": "https://bouldering-sns.firebaseio.com",
-    "project_id": "bouldering-sns",
-    "storage_bucket": "bouldering-sns.appspot.com"
+    "project_number": "312272897694",
+    "firebase_url": "https://bouldering-de6da.firebaseio.com",
+    "project_id": "bouldering-de6da",
+    "storage_bucket": "bouldering-de6da.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1001661432737:android:b2a6d25abd9dfcc10f41e0",
+        "mobilesdk_app_id": "1:312272897694:android:3237a9fc0e2cfdb8b1dd8f",
         "android_client_info": {
-          "package_name": "com.example.bouldering_sns"
+          "package_name": "com.example.bouldering"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1001661432737-hc0t03vi40k55l3iqjuh45p3o1958imf.apps.googleusercontent.com",
+          "client_id": "312272897694-r5qu1iffg2r6eg6n7gdb20696c0qdr23.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bouldering",
+            "certificate_hash": "c5cff1077c90f009e4b77d7f9d6b484c816bd275"
+          }
+        },
+        {
+          "client_id": "312272897694-agpt1kdc5tl0b84ioeq2n7g3belpr1sm.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCZIfxd9TQPOe_3z5F6dhwcgXdOYPS9Za0"
+          "current_key": "AIzaSyAz4vCzntcPH_mbDvBK28AIv8CFieswdT4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1001661432737-hc0t03vi40k55l3iqjuh45p3o1958imf.apps.googleusercontent.com",
+              "client_id": "312272897694-agpt1kdc5tl0b84ioeq2n7g3belpr1sm.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

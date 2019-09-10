@@ -3,6 +3,7 @@ import 'package:bouldering_sns/SplashScreen/SplashWidget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthEntranceWedget extends StatefulWidget {
   AuthEntranceWedget({Key key}) : super(key: key);
@@ -32,6 +33,10 @@ class _AuthEntranceState extends State<AuthEntranceWedget> {
     });
     await MySharedPreferences.setFirebaseUID(user.uid);
     print(username);
+    await Firestore.instance.collection('users').document(user.uid).setData({
+      'uid': user.uid, 'email': user.email, 'displayName': user.displayName,
+    });
+
     Navigator.of(context).pushReplacement(new MaterialPageRoute(
       builder: (BuildContext context) => SplashWidget(),
     ));

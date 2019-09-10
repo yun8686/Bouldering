@@ -1,10 +1,9 @@
-import 'package:bouldering_sns/Authentication/AuthEntranceWedget.dart';
 import 'package:bouldering_sns/Friends/FriendsWidget.dart';
+import 'package:bouldering_sns/Home/HomeWidget.dart';
 import 'package:bouldering_sns/camera/camera.dart';
 import 'package:bouldering_sns/Setting/SettingWidget.dart';
 import 'package:bouldering_sns/SplashScreen/SplashWidget.dart';
 import 'package:flutter/material.dart';
-import 'Library/SharedPreferences.dart';
 
 void main() => runApp(
       MaterialApp(
@@ -36,14 +35,6 @@ class MyImagePage extends StatefulWidget {
 
 class _MyImagePageState extends State<MyImagePage> {
   int _selectedIndex = 0;
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    MySharedPreferences.setFirebaseUID("OKOO").then((ok){
-      print("OK: " + ok.toString());
-    });
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,8 +85,8 @@ class _MyImagePageState extends State<MyImagePage> {
         return SettingWidget();
       case 2:
         return FriendsWidget();
-//      case 0:
-//        return AuthEntranceWedget();
+      case 0:
+        return HomeWidget();
     }
     return SettingWidget();
   }
