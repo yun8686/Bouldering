@@ -37,7 +37,9 @@ class FriendsWidgetState extends State<FriendsWidget> {
                 Center(child: Column(children: getFriendsWidgets())),
                 Center(child: Column(children: getNearByWidgets())),
               ],
-            )));
+            )
+        )
+    );
   }
 
   List<Widget> getFriendsWidgets() {
