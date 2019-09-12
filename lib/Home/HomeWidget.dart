@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeWidget extends StatefulWidget {
   @override
@@ -47,7 +48,7 @@ class _HomeWidgetState extends State<HomeWidget> {
         backgroundImage: new NetworkImage(
             "https://booth.pximg.net/c3d42cdb-5e97-43ff-9331-136453807f10/i/616814/d7def86b-1d95-4f2d-ad9c-c0c218e6a533_base_resized.jpg"),
       ),
-      title: new Text("ロード中"),
+      title: new Text("↓Pull to update"),
     ),
   ];
   void updatePosition() async{
@@ -56,7 +57,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     PlacesSearchResponse response = await places.searchByText("ロッククライミングジム", language: "ja", location: Location(position.latitude, position.longitude));
     _nearGymList.removeRange(0, _nearGymList.length);
     response.results.forEach((res){
-      PlacesSearchResult result = res;
+      final PlacesSearchResult result = res;
       _nearGymList.add(
           ListTile(
             leading: new CircleAvatar(
@@ -64,6 +65,13 @@ class _HomeWidgetState extends State<HomeWidget> {
                   "https://booth.pximg.net/c3d42cdb-5e97-43ff-9331-136453807f10/i/616814/d7def86b-1d95-4f2d-ad9c-c0c218e6a533_base_resized.jpg"),
             ),
             title: new Text(result.name),
+            trailing: IconButton(
+                icon: Icon(Icons.map),
+                onPressed: () {
+                  print("mapped: " + result.placeId);
+                  _launchMaps(result.placeId);
+                }),
+            onTap: (){print("listed");},
           )
       );
       print(result.name);
@@ -223,6 +231,7 @@ class _HomeWidgetState extends State<HomeWidget> {
       child: Container(
           child: RefreshIndicator(
               onRefresh: () async{
+                await updatePosition();
                 setState(() {
                   this._nearGymList = _nearGymList.map((v){return v;}).toList();
                 });
@@ -249,6 +258,15 @@ class _HomeWidgetState extends State<HomeWidget> {
       ));
     }
     return users;
+  }
+
+  void _launchMaps(String placeId) async {
+    String url = 'https://www.google.com/maps/search/?api=1&query=Google&query_place_id=' + placeId ;
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch Maps';
+    }
   }
 }
 

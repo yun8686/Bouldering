@@ -26,6 +26,7 @@ dependencies:
   permission_handler: any
   geolocator: any
   google_maps_webservice: any
+  url_launcher: any
   firebase_core: any
   firebase_storage: any
   firebase_auth: any
