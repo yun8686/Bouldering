@@ -1,3 +1,4 @@
+import 'package:bouldering_sns/Home/Widgets/FavolitGymListWidget.dart';
 import 'package:bouldering_sns/Home/Widgets/NearGymListWidget.dart';
 import 'package:flutter/material.dart';
 import 'Widgets/UserPanelWidget.dart';
@@ -34,7 +35,7 @@ class HomeWidget extends StatelessWidget {
                     TabBar(
                       tabs: [
                         Tab(text: "近いジム"),
-                        Tab(text: "遠いジム"),
+                        Tab(text: "お気に入りジム"),
                       ],
                     ),
                   ),
@@ -45,7 +46,7 @@ class HomeWidget extends StatelessWidget {
             body: TabBarView(
               children: <Widget>[
                 NearGymListWidget(key: PageStorageKey(1)),
-                NearGymListWidget(key: PageStorageKey(2)),
+                FavoliteGymListWidget(key: PageStorageKey(2)),
               ],
             ),
           ),

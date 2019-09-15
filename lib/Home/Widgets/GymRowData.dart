@@ -2,19 +2,18 @@ import 'dart:convert';
 
 class GymRowData{
   String name,placeId;
-  bool favolite;
-  GymRowData({String name, String placeId, bool favolite}){
+  int favolite;
+  GymRowData({String name, String placeId, int favolite}){
     this.name = name;
     this.placeId = placeId;
     this.favolite = favolite;
   }
-  GymRowData.fromJSON(String jsonString){
-    Map map = json.decode(jsonString);
+  GymRowData.fromMap(Map map){
     this.name = map['name'];
     this.placeId = map['placeId'];
     this.favolite = map['favolite'];
   }
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toMap() => {
     'name': name ,
     'placeId': placeId ,
     'favolite': favolite,

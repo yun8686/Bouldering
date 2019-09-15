@@ -7,14 +7,14 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class NearGymListWidget extends StatefulWidget {
-  NearGymListWidget({Key key}) : super(key: key);
+class FavoliteGymListWidget extends StatefulWidget {
+  FavoliteGymListWidget({Key key}) : super(key: key);
   @override
-  _NearGymListState createState() => _NearGymListState();
+  _FavoliteGymListState createState() => _FavoliteGymListState();
 }
 
-class _NearGymListParam{
-  List<Widget> _nearGymList = <Widget>[
+class _FavoliteGymListParam{
+  List<Widget> _favoriteGymList = <Widget>[
     ListTile(
       leading: new CircleAvatar(
         backgroundImage: new NetworkImage("https://booth.pximg.net/c3d42cdb-5e97-43ff-9331-136453807f10/i/616814/d7def86b-1d95-4f2d-ad9c-c0c218e6a533_base_resized.jpg"),
@@ -24,38 +24,25 @@ class _NearGymListParam{
   ];
 }
 
-class _NearGymListState extends State<NearGymListWidget> {
-  _NearGymListParam params = null;
+class _FavoliteGymListState extends State<FavoliteGymListWidget> {
+  _FavoliteGymListParam params = null;
   final places = new GoogleMapsPlaces(apiKey: "AIzaSyAz4vCzntcPH_mbDvBK28AIv8CFieswdT4");
 
   @override
   void initState() {
     super.initState();
-    params = _NearGymListParam();
+    params = _FavoliteGymListParam();
     // GPSの準備
-    showNearGymList();
+    showFavoliteGymList();
   }
 
   void didChangeDependencies(){
     super.didChangeDependencies();
   }
 
-  void setNearGymList() async{
-    Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    position.latitude.toString();
-    PlacesSearchResponse response = await places.searchByText("ロッククライミングジム", language: "ja", location: Location(position.latitude, position.longitude));
-    List<GymRowData> nearGymList = List<GymRowData>();
-    response.results.forEach((res) {
-      final PlacesSearchResult result = res;
-      GymRowData gymRowData = GymRowData(name: result.name, placeId: result.placeId, favolite: 1);
-      nearGymList.add(gymRowData);
-    });
-    MySharedPreferences.setNearGymList(nearGymList);
-  }
-
-  void showNearGymList() async{
+  void showFavoliteGymList() async{
     List<Widget> newGymList = List<Widget>();
-    List<GymRowData> gymList = await MySharedPreferences.getNearGymList();
+    List<GymRowData> gymList = await MySharedPreferences.getFavoriteGym();
     if(gymList == null || gymList.length == 0) return;
     gymList.forEach((gymRowData)=>newGymList.add(
         ListTile(
@@ -71,7 +58,7 @@ class _NearGymListState extends State<NearGymListWidget> {
                   await MySharedPreferences.removeFavoliteGymPlaceid(gymRowData.placeId);
                 }
                 print(gymRowData.placeId);
-                await showNearGymList();
+                await showFavoliteGymList();
               }
           ),
           title: new Text(gymRowData.name),
@@ -84,13 +71,12 @@ class _NearGymListState extends State<NearGymListWidget> {
     );
     if(this.mounted){
       setState(() {
-        params._nearGymList = newGymList;
+        params._favoriteGymList = newGymList;
       });
     }
   }
   void updatePosition() async{
-    await this.setNearGymList();
-    await showNearGymList();
+    await showFavoliteGymList();
   }
 
   @override
@@ -107,7 +93,7 @@ class _NearGymListState extends State<NearGymListWidget> {
                 await updatePosition();
               },
               child: new ListView(
-                children: params._nearGymList,
+                children: params._favoriteGymList,
               ))),
     ));
     return widgets;

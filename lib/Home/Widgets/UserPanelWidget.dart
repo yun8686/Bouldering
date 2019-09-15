@@ -17,10 +17,12 @@ class _HomePanelState extends State<UserPanelWidget> {
           .document(uid)
           .get()
           .then((DocumentSnapshot data) {
-        setState(() {
-          this.displayName = data["displayName"] ?? "";
-          this.email = data["email"] ?? "";
-        });
+        if(this.mounted) {
+          setState(() {
+            this.displayName = data["displayName"] ?? "";
+            this.email = data["email"] ?? "";
+          });
+        }
       });
     });
   }

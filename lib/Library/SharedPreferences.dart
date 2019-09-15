@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:bouldering_sns/Home/Widgets/GymRowData.dart';
+import 'package:bouldering_sns/Library/SQLiteDatabase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 
 class MySharedPreferences{
   static SharedPreferences prefs;
@@ -22,27 +24,57 @@ class MySharedPreferences{
     return prefs.getString(_FIREBASE_UID);
   }
 
-
-  static final String _NEARGYMLIST = "NEARGYMLIST";
-  static Future<bool> setNearGymList(List<GymRowData> gymRowDataList){
+  static Future<bool> setNearGymList(List<GymRowData> gymRowDataList) async{
     List<String> strList = List<String>();
+    Database database = await SQLiteDatabase.getDatabase();
+    database.delete(Tables.NearGymList);
     gymRowDataList.forEach((GymRowData v){
-      strList.add(json.encode(v));
+      database.insert(Tables.NearGymList, {
+        'name': v.name,
+        'placeId': v.placeId,
+      });
     });
-    prefs.setStringList(_NEARGYMLIST, strList);
   }
 
-  static List<GymRowData> getNearGymList() {
-    List<String> strs = prefs.getStringList(_NEARGYMLIST);
-    if(strs == null) return null;
-    List<GymRowData> nearGymList = List<GymRowData>();
-    strs.forEach((str){
-      print(str);
-      nearGymList.add(GymRowData.fromJSON(str));
-    });
-    return nearGymList;
+  static Future<List<GymRowData>> getNearGymList() async {
+    Database database = await SQLiteDatabase.getDatabase();
+    List<Map> list = await database.rawQuery("""
+      SELECT 
+        a.*, 
+        case when (select count(1) from ${Tables.FavoriteGymList} where placeId = a.placeId)>0 then 1 else 0 end as favolite 
+      FROM ${Tables.NearGymList} a;
+    """);
+    return list.map((data){
+      return GymRowData.fromMap(data);
+    }).toList();
   }
 
   static final String _FAVOLITEGYMLIST = "FAVOLITEGYMLIST";
+  static Future<void> addFavoliteGymPlaceid(String placeId) async{
+    Database database = await SQLiteDatabase.getDatabase();
+    try{
+      await database.rawQuery(
+          "INSERT INTO ${Tables.FavoriteGymList} SELECT '${placeId}';"
+      );
+    }catch(e){}
+  }
+  static Future<void> removeFavoliteGymPlaceid(String placeId) async{
+    Database database = await SQLiteDatabase.getDatabase();
+    try{
+      await database.rawQuery(
+          "delete from ${Tables.FavoriteGymList} where placeId = '${placeId}';"
+      );
+    }catch(e){}
+  }
+  static Future<List<GymRowData>> getFavoriteGym() async{
+    Database database = await SQLiteDatabase.getDatabase();
+    List<Map> list = await database.rawQuery("""
+      SELECT a.*, 1 as favolite
+      FROM ${Tables.NearGymList} a join FavoriteGymList b on a.placeId = b.placeId;
+    """);
+    return list.map((data){
+      return GymRowData.fromMap(data);
+    }).toList();
+  }
 //  static
 }
