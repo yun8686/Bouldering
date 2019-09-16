@@ -62,8 +62,7 @@ class _AuthEntranceState extends State<AuthEntranceWedget> {
     if (this.size == null) this.size = MediaQuery.of(context).size;
     return Scaffold(
 //        resizeToAvoidBottomInset: false,
-        body: SafeArea(
-            child: Stack(children: <Widget>[
+        body: Stack(children: <Widget>[
           Positioned.fill(
             child: Image(
               image: AssetImage('assets/backgroundimages/login.jpg'),
@@ -71,8 +70,9 @@ class _AuthEntranceState extends State<AuthEntranceWedget> {
             ),
           ),
           Container(
+            height: this.size.height/2,
             width: this.size.width,
-            child: ConstrainedBox(
+            child: Center(child:ConstrainedBox(
               constraints: BoxConstraints(
                 minHeight: 30.0,
                 maxHeight: 100.0,
@@ -83,18 +83,18 @@ class _AuthEntranceState extends State<AuthEntranceWedget> {
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 40.0, color: Colors.white),
               ),
-            ),
+            )),
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              SizedBox(height: 200),
               Center(child: LoginAreaWidget()),
               SizedBox(height: 30),
               Center(child: SNSButtonSetWidget()),
             ],
           ),
         ])
-        )
     );
   }
 
