@@ -1,3 +1,4 @@
+import 'package:bouldering_sns/Profile/ProfileWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:bouldering_sns/Library/SharedPreferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -42,13 +43,22 @@ class _HomePanelState extends State<UserPanelWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Material(
-            elevation: 5.0,
-            shape: CircleBorder(),
-            child: CircleAvatar(
-                radius: 40.0,
-                backgroundImage: NetworkImage(
-                    "https://booth.pximg.net/c3d42cdb-5e97-43ff-9331-136453807f10/i/616814/d7def86b-1d95-4f2d-ad9c-c0c218e6a533_base_resized.jpg"))),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(context,
+                new MaterialPageRoute<Null>(
+                  builder: (BuildContext context) => ProfileWidget(),
+                ));
+          },
+          child:Material(
+              elevation: 5.0,
+              shape: CircleBorder(),
+              child: CircleAvatar(
+                  radius: 40.0,
+                  backgroundImage: NetworkImage(
+                      "https://booth.pximg.net/c3d42cdb-5e97-43ff-9331-136453807f10/i/616814/d7def86b-1d95-4f2d-ad9c-c0c218e6a533_base_resized.jpg"))),
+        )
+
       ],
     );
   }
