@@ -1,6 +1,7 @@
 import 'package:bouldering_sns/Library/SharedPreferences.dart';
 import 'package:bouldering_sns/SplashScreen/SplashWidget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -60,7 +61,7 @@ class _AuthEntranceState extends State<AuthEntranceWedget> {
   Widget build(BuildContext context) {
     if (this.size == null) this.size = MediaQuery.of(context).size;
     return Scaffold(
-        resizeToAvoidBottomInset: false,
+//        resizeToAvoidBottomInset: false,
         body: SafeArea(
             child: Stack(children: <Widget>[
           Positioned.fill(
@@ -88,32 +89,19 @@ class _AuthEntranceState extends State<AuthEntranceWedget> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Center(child: LoginAreaWidget()),
-              StreamBuilder(
-                  stream: _auth.onAuthStateChanged,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return MaterialButton(
-                        onPressed: () => _handleSignOut(),
-                        color: Colors.red,
-                        textColor: Colors.white,
-                        child: Text('Signout'),
-                      );
-                    } else {
-                      return MaterialButton(
-                        onPressed: () => _handleSignIn(),
-                        color: Colors.white,
-                        textColor: Colors.black,
-                        child: Text('Login with Google'),
-                      );
-                    }
-                  }),
+              SizedBox(height: 30),
+              Center(child: SNSButtonSetWidget()),
             ],
-          )
-        ])));
+          ),
+        ])
+        )
+    );
   }
 
   int id_length = 0;
   int pw_length = 0;
+  final FocusNode _idFocusNode = new FocusNode();
+  final FocusNode _pwFocusNode = new FocusNode();
   Widget LoginAreaWidget() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -122,11 +110,14 @@ class _AuthEntranceState extends State<AuthEntranceWedget> {
             width: size.width * 0.7,
             height: 60,
             child: TextField(
+              focusNode: _idFocusNode,
               onChanged: (text) {
                 setState(() {
                   this.id_length = text.length;
                 });
               },
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () => FocusScope.of(context).requestFocus(_pwFocusNode),
               decoration: new InputDecoration(
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 0, horizontal: 20),
@@ -148,6 +139,7 @@ class _AuthEntranceState extends State<AuthEntranceWedget> {
             width: size.width * 0.7,
             height: 60,
             child: TextField(
+              focusNode: _pwFocusNode,
               obscureText: true,
               onChanged: (text) {
                 setState(() {
@@ -155,17 +147,17 @@ class _AuthEntranceState extends State<AuthEntranceWedget> {
                 });
               },
               decoration: new InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-                  hintText: "PW",
-                  filled: true,
-                  fillColor: Colors.white,
-                  suffixIcon: Icon(
-                    Icons.check_circle,
-                    color: this.pw_length > 0 ? Colors.greenAccent : Colors.transparent,
-                  ),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.all(Radius.circular(40.0)))),
+                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+                hintText: "PW",
+                filled: true,
+                fillColor: Colors.white,
+                suffixIcon: Icon(
+                  Icons.check_circle,
+                  color: this.pw_length > 0 ? Colors.greenAccent : Colors.transparent,
+                ),
+                border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.all(Radius.circular(40.0)))),
             )),
       Container(
         width: size.width*0.4,
@@ -179,6 +171,31 @@ class _AuthEntranceState extends State<AuthEntranceWedget> {
           },
         )
       ),
+      ],
+    );
+  }
+
+  Widget SNSButtonSetWidget(){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        SignInButton(
+          Buttons.Google,
+          mini: true,
+          onPressed: () => _handleSignIn(),
+        ),
+        SizedBox(width: 16),
+        SignInButton(
+          Buttons.Facebook,
+          mini: true,
+          onPressed: () {},
+        ),
+        SizedBox(width: 16),
+        SignInButton(
+          Buttons.Twitter,
+          mini: true,
+          onPressed: () {},
+        ),
       ],
     );
   }

@@ -36,6 +36,7 @@ dependencies:
   sqflite: any
   path: any
   auto_size_text: any
+  flutter_signin_button: any
 
 dev_dependencies:
   flutter_test:
