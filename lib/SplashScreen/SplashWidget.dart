@@ -28,12 +28,12 @@ class _SplashWidgetState extends State<SplashWidget> {
     print("initState");
     MySharedPreferences.getFirebaseUID().then((firebaseUID){
       if(firebaseUID != null){
-        print("firebaseUID : " + firebaseUID.toString());
+        // ログイン済みの場合はMyApp
         Navigator.of(context).pushReplacement(new MaterialPageRoute(
           builder: (BuildContext context) => MyApp(),
         ));
       }else{
-        print("firebaseUID : isNaN");
+        // 未ログインの場合はAuthEntrance
         Navigator.of(context).pushReplacement(new MaterialPageRoute(
           builder: (BuildContext context) => AuthEntranceWedget(),
         ));
