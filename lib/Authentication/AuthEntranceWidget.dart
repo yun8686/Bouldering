@@ -7,14 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
-class AuthEntranceWedget extends StatefulWidget {
-  AuthEntranceWedget({Key key}) : super(key: key);
+class AuthEntranceWidget extends StatefulWidget {
+  AuthEntranceWidget({Key key}) : super(key: key);
 
   @override
   _AuthEntranceState createState() => _AuthEntranceState();
 }
 
-class _AuthEntranceState extends State<AuthEntranceWedget> {
+class _AuthEntranceState extends State<AuthEntranceWidget> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -86,12 +86,12 @@ class _AuthEntranceState extends State<AuthEntranceWedget> {
             )),
           ),
           Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              SizedBox(height: 200),
               Center(child: LoginAreaWidget()),
               SizedBox(height: 30),
               Center(child: SNSButtonSetWidget()),
+              SizedBox(height: 60),
             ],
           ),
         ])

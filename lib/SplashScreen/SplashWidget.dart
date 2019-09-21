@@ -1,4 +1,4 @@
-import 'package:bouldering_sns/Authentication/AuthEntranceWedget.dart';
+import 'package:bouldering_sns/Authentication/AuthEntranceWidget.dart';
 import 'package:bouldering_sns/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +35,7 @@ class _SplashWidgetState extends State<SplashWidget> {
       }else{
         // 未ログインの場合はAuthEntrance
         Navigator.of(context).pushReplacement(new MaterialPageRoute(
-          builder: (BuildContext context) => AuthEntranceWedget(),
+          builder: (BuildContext context) => AuthEntranceWidget(),
         ));
       }
     });
