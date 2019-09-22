@@ -90,9 +90,10 @@ class _GradeListTile extends StatelessWidget{
 
 class GymHeaderCard extends StatelessWidget {
   String title, placeId;
+  double distance;
   IconButton leadIconButton;
   void Function() onTap;
-  GymHeaderCard({this.title, this.placeId, this.leadIconButton, this.onTap});
+  GymHeaderCard({this.title, this.placeId, this.leadIconButton, this.onTap, this.distance});
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -113,11 +114,17 @@ class GymHeaderCard extends StatelessWidget {
                   }),
           onTap: this.onTap ?? () {},
           title: new Text(this.title.toString()),
-          trailing: IconButton(
-              icon: Icon(Icons.map),
-              onPressed: () {
-                _launchMaps(this.placeId);
-              }),
+          trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                distance!=null?Text("${(distance.toStringAsFixed(1))}km"):Text("0km"),
+              IconButton(
+                icon: Icon(Icons.map),
+                onPressed: () {
+                  _launchMaps(this.placeId);
+                }),
+            ]
+          ),
         )));
   }
 

@@ -32,7 +32,8 @@ class SQLiteDatabase {
         CREATE TABLE ${Tables.NearGymList}
           (
             placeId TEXT PRIMARY KEY,
-            name TEXT
+            name TEXT,
+            distance double
           );
         """);
         newDb.execute("""

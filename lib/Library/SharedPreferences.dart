@@ -32,6 +32,7 @@ class MySharedPreferences{
       database.insert(Tables.NearGymList, {
         'name': v.name,
         'placeId': v.placeId,
+        'distance': v.distance,
       });
     });
   }

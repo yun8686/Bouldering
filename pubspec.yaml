@@ -37,6 +37,7 @@ dependencies:
   path: any
   auto_size_text: any
   flutter_signin_button: any
+  bubble: any
 
 dev_dependencies:
   flutter_test:

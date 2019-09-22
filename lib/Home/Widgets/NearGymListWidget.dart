@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:bouldering_sns/GymDetail/GymList.dart';
 import 'package:bouldering_sns/Home/Widgets/GymRowData.dart';
@@ -6,6 +7,7 @@ import 'package:bouldering_sns/Library/SharedPreferences.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:google_maps_webservice/places.dart' as prefix0;
 import 'package:url_launcher/url_launcher.dart';
 
 class NearGymListWidget extends StatefulWidget {
@@ -48,11 +50,27 @@ class _NearGymListState extends State<NearGymListWidget> {
     List<GymRowData> nearGymList = List<GymRowData>();
     response.results.forEach((res) {
       final PlacesSearchResult result = res;
-      GymRowData gymRowData = GymRowData(name: result.name, placeId: result.placeId, favolite: 1);
+      GymRowData gymRowData = GymRowData(name: result.name, placeId: result.placeId, favolite: 1, distance: distance(position, result.geometry.location));
       nearGymList.add(gymRowData);
     });
     MySharedPreferences.setNearGymList(nearGymList);
   }
+
+  double distance(Position position, prefix0.Location googlePosition) {
+    // 緯度経度をラジアンに変換
+    double currentLa   = position.latitude * pi / 180.0;
+    double currentLo   = position.longitude * pi / 180.0;
+    double targetLa    = googlePosition.lat * pi / 180;
+    double targetLo    = googlePosition.lng * pi / 180;
+    // 赤道半径
+    double equatorRadius = 6378137.0;
+
+    // 算出
+    double averageLat = (currentLa - targetLa) / 2.0;
+    double averageLon = (currentLo - targetLo) / 2.0;
+    double distance = equatorRadius * 2 * asin(sqrt(pow(sin(averageLat), 2) + cos(currentLa) * cos(targetLa) * pow(sin(averageLon), 2)));
+    return distance / 1000.0;
+}
 
   void showNearGymList() async{
     List<Widget> newGymList = List<Widget>();
@@ -61,6 +79,7 @@ class _NearGymListState extends State<NearGymListWidget> {
     gymList.forEach((gymRowData)=>newGymList.add(GymHeaderCard(
       title: gymRowData.name,
       placeId: gymRowData.placeId,
+      distance: gymRowData.distance,
       onTap: (){
         Navigator.push(context, new MaterialPageRoute<Null>(
           builder: (BuildContext context) => GymListWidget(title: gymRowData.name, placeId: gymRowData.placeId,),
