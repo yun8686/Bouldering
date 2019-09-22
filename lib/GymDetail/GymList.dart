@@ -1,28 +1,39 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bouldering_sns/GymDetail/ProblemDetail.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_webservice/places.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class GymListWidget extends StatelessWidget {
   String title, placeId;
+
   GymListWidget({this.title, this.placeId}) {
-    print(this.placeId);
   }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Column(
-          children: <Widget>[
-            GymHeaderCard(title: this.title, placeId: this.placeId),
-            Expanded(
-                child: ListView(
-              children: <Widget>[
+        body: CustomScrollView(
+          slivers: <Widget>[
+            _AppbarWidget(title: title, placeId: placeId),
+            SliverList(
+              delegate:new SliverChildListDelegate(<Widget>[
                 _createGradeListTile(context, "3級"),
                 _createGradeListTile(context, "2級"),
                 _createGradeListTile(context, "1級"),
-              ],
-            )),
+                _createGradeListTile(context, "3級"),
+                _createGradeListTile(context, "2級"),
+                _createGradeListTile(context, "1級"),
+                _createGradeListTile(context, "3級"),
+                _createGradeListTile(context, "2級"),
+                _createGradeListTile(context, "1級"),
+                _createGradeListTile(context, "3級"),
+                _createGradeListTile(context, "2級"),
+                _createGradeListTile(context, "1級"),
+              ]),
+            ),
           ],
         ),
       ),
@@ -43,6 +54,43 @@ class GymListWidget extends StatelessWidget {
                         placeId: this.placeId),
               ));
         });
+  }
+}
+
+class _AppbarWidget extends StatefulWidget{
+  String title, placeId;
+  _AppbarWidget({this.title, this.placeId});
+  @override
+  _AppbarWidgetState createState() => _AppbarWidgetState(title:title, placeId:placeId);
+}
+class _AppbarWidgetState extends State<_AppbarWidget>{
+  String title, placeId, imageUrl;
+  double imageHeight = 256.0;
+  _AppbarWidgetState({this.title, this.placeId});
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    final places = new GoogleMapsPlaces(apiKey: "AIzaSyAz4vCzntcPH_mbDvBK28AIv8CFieswdT4");
+    places.getDetailsByPlaceId(placeId, language: "ja").then((val){
+      Size mediasize = MediaQuery.of(context).size;
+      setState((){
+        this.imageHeight = (mediasize.width.toInt()/val.result.photos[0].width.toInt())*val.result.photos[0].height;
+        this.imageUrl = places.buildPhotoUrl(photoReference: val.result.photos[0].photoReference, maxWidth: mediasize.width.toInt());
+      });
+    });
+  }
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return SliverAppBar(
+      pinned: true,
+      expandedHeight: imageHeight,
+      title: Text(this.title),
+      flexibleSpace: new FlexibleSpaceBar(
+        background: Image(fit: BoxFit.fitWidth, image: this.imageUrl!=null?NetworkImage(this.imageUrl):AssetImage('assets/backgroundimages/login.jpg')),
+      ),
+    );
   }
 
 }
@@ -97,9 +145,7 @@ class GymHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Hero(
-        tag: this.placeId,
-        child: Card(
+    return Card(
             child: ListTile(
           leading: this.leadIconButton ??
               IconButton(
@@ -125,7 +171,7 @@ class GymHeaderCard extends StatelessWidget {
                 }),
             ]
           ),
-        )));
+        ));
   }
 
   void _launchMaps(String placeId) async {
