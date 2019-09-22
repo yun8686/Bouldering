@@ -32,7 +32,7 @@ class _MyImagePageState extends State<MyImagePage>{
   Size mediasize;
   //　選択フラグ
   var pressAttention = new List.generate(4, (i)=>false);
-  var selectIcon = '';
+  var selectMark = '';
 
   GlobalKey _canvasKey = GlobalKey();
 
@@ -162,7 +162,7 @@ class _MyImagePageState extends State<MyImagePage>{
       pressAttention[i] = false;
     }
     pressAttention[number] = true;
-    selectIcon = name;
+    selectMark = name;
   }
 
   void _showModalBottomSheet() {
@@ -231,21 +231,10 @@ class _MyImagePageState extends State<MyImagePage>{
 
   void _onTapUp(TapUpDetails details) {
     RenderBox referenceBox = _canvasKey.currentContext.findRenderObject();
-    // 丸を表示選択
-    // if(selectIcon == 'maru'){
-    //   nowMark = new Maru(referenceBox.globalToLocal(details.globalPosition), 20);
-    // }
-    // else if(selectIcon == 'label'){
-    //   nowMark = new Mark(referenceBox.globalToLocal(details.globalPosition), 20);
-    // }
-    if(selectIcon == 'start'){
-      nowMark = new Mark(referenceBox.globalToLocal(details.globalPosition), 20);
-    }
-    // else if(selectIcon == 'gole'){
-    //   nowMark = new Mark(referenceBox.globalToLocal(details.globalPosition), 20);
-    // }
-    else
-    nowMark = new MarkStart(referenceBox.globalToLocal(details.globalPosition), 20);
+    print('referenceBox');
+    print(referenceBox);
+    print(referenceBox.globalToLocal(details.globalPosition));
+    nowMark = new Mark(referenceBox.globalToLocal(details.globalPosition), 20 , selectMark);
     setState(() {
       marks.add(nowMark);
     });
@@ -253,6 +242,8 @@ class _MyImagePageState extends State<MyImagePage>{
     setState(() {
       marks.add(nowMark);
     });
+
+    //受け取る値を代入する変数を定義
   }
   void _onPointerMove(LongPressMoveUpdateDetails details) {
     RenderBox referenceBox = _canvasKey.currentContext.findRenderObject();
@@ -281,10 +272,22 @@ class _MyImagePageState extends State<MyImagePage>{
 class Mark {
   Offset offset;
   double scale;
+  String selectMark;
 
-  Mark(this.offset, this.scale);
+  Mark(this.offset, this.scale, this.selectMark);
 
   void drawToCanvas(Canvas canvas){
+    if(this.selectMark == 'maru'){
+      printMaru(canvas);
+    }else if(this.selectMark == 'start'){
+      drawS(canvas);
+    }else if(this.selectMark == 'gole'){
+      drawG(canvas);
+    }else if(this.selectMark == 'label'){
+      drawLabel(canvas);
+    }
+  }
+  void printMaru(Canvas canvas){
     Paint paint = Paint()
       ..isAntiAlias = true
       ..color = Colors.blue //いる
@@ -292,10 +295,11 @@ class Mark {
       ..style = PaintingStyle.stroke;
     canvas.drawCircle(this.offset, this.scale, paint); //いる
   }
+
   void drawS(Canvas canvas){
     var textStyle = TextStyle(
       color: Colors.black,
-      fontSize: 30,
+      fontSize: 20,
     );
     var textSpan = TextSpan(
       text: 'S',
@@ -307,18 +311,39 @@ class Mark {
     );
     textPainter.layout(
       minWidth: 0,
-      maxWidth: 12,
+      maxWidth: 20,
     );
     textPainter.paint(canvas, this.offset);
   }
-}
 
-class MarkStart extends Mark {
-  MarkStart(ui.Offset offset, double scale) : super(offset, scale);
-  // super.drawS(Canvas canvas);
-  // canvas.drawCircle(this.offset, this.scale, paint);
-  void drawS(Canvas canvas) {
-    super.drawS(canvas);
+  void drawG(Canvas canvas){
+    var textStyle = TextStyle(
+      color: Colors.black,
+      fontSize: 20,
+    );
+    var textSpan = TextSpan(
+      text: 'G',
+      style: textStyle,
+    );
+    var textPainter = TextPainter(
+      text: textSpan,
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout(
+      minWidth: 0,
+      maxWidth: 20,
+    );
+    textPainter.paint(canvas, this.offset);
+  }
+
+  void drawLabel(Canvas canvas){
+    Paint paint = Paint()
+      ..isAntiAlias = true
+      ..color = Colors.blue //いる
+      ..strokeWidth = 5.0 //いる
+      ..style = PaintingStyle.stroke;
+    Rect r = new Rect.fromLTWH(this.offset.dx, this.offset.dy, 30, 5);
+    canvas.drawRect(r, paint);
   }
 }
 
@@ -334,26 +359,6 @@ class ImagePainter extends CustomPainter{
   void paint(ui.Canvas canvas, ui.Size size) {
     this.mediaSize = size;
     drawToCanvas(canvas);
-    drawS(canvas);
-  }
-
-  void drawS(ui.Canvas canvas){
-    if(this.image != null){
-      var paint = new Paint();
-      canvas.save();
-      double scale = min(mediaSize.width/this.image.width.toDouble(), mediaSize.height/this.image.height.toDouble());
-      canvas.scale(scale, scale);
-
-      double pos = (mediaSize.height- this.image.height*scale);
-      canvas.drawImage(this.image, Offset(0,pos), paint);
-      canvas.restore();
-    }
-
-    canvas.save();
-    for(Mark mark in marks){
-      mark.drawS(canvas);
-    }
-    canvas.restore();
   }
 
   void drawToCanvas(ui.Canvas canvas){
@@ -384,9 +389,7 @@ class ImagePainter extends CustomPainter{
   void saveImage() async {
     ui.PictureRecorder recorder = ui.PictureRecorder();
     ui.Canvas canvas = Canvas(recorder);
-    // ここでタップしたらスタンプ表示する
     drawToCanvas(canvas);
-    drawS(canvas);
     ui.Picture picture = recorder.endRecording();
     ui.Image img = await picture.toImage(mediaSize.width.toInt(), mediaSize.height.toInt());
     final ByteData bytedata = await img.toByteData(format: ui.ImageByteFormat.png);
@@ -397,6 +400,7 @@ class ImagePainter extends CustomPainter{
   }
 
   // カメラか持っている画像を選択させる
+  
 
 
 }
