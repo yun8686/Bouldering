@@ -1,4 +1,5 @@
 import 'package:bouldering_sns/GymDetail/ProblemDetailWidget.dart';
+import 'package:bouldering_sns/GymDetail/ProblemMakeWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -17,7 +18,14 @@ class ProblemListWidget extends StatelessWidget {
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
-          onPressed: (){},
+          onPressed: (){
+            Navigator.push(
+                context,
+                MaterialPageRoute<Null>(
+                  fullscreenDialog: true,
+                    builder: (BuildContext context) =>
+                        ProblemMakeWidget()));
+          },
         ),
       ),
     );
