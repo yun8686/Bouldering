@@ -16,17 +16,22 @@ class CameraWidget extends StatelessWidget{
         primarySwatch: Colors.pink,
         primaryColor: Colors.pink,
       ),
-      home: new MyImagePage(),
+      home: new MyImagePage(context:context),
     );
   }
 }
 
 class MyImagePage extends StatefulWidget{
+  BuildContext context;
+  MyImagePage({this.context});
+
   @override
-  _MyImagePageState createState() => _MyImagePageState();
+  _MyImagePageState createState() => _MyImagePageState(context: this.context);
 }
 
 class _MyImagePageState extends State<MyImagePage>{
+  BuildContext context;
+    _MyImagePageState({this.context});
   ui.Image targetimage;
   File imageFile;
   Size mediasize;
@@ -40,17 +45,20 @@ class _MyImagePageState extends State<MyImagePage>{
   Widget build(BuildContext context) {
     mediasize = MediaQuery.of(context).size;
     return Scaffold(
-     appBar: AppBar(
-       leading: Icon(Icons.arrow_back),
-       title: Text("編集中"),
-       actions: <Widget>[
-         FlatButton(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(this.context),
+        ),
+        title: Text("編集中"),
+        actions: <Widget>[
+          FlatButton(
           textColor: Colors.white,
           onPressed: () {},
           child: Text("次へ"),
           shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
         ),
-       ],
+      ],
      ),
       body: SafeArea(
         child: GestureDetector(
@@ -144,8 +152,9 @@ class _MyImagePageState extends State<MyImagePage>{
                     onTapUp: _onReset,
                   ),
                 ),
-                Expanded(child: Container(
-                    child: Icon(Icons.check_box)
+                Expanded(child: GestureDetector(
+                    child: Icon(Icons.check_box),
+                    onTapUp: _onSave,
                   ),
                 ),
               ])
@@ -293,6 +302,17 @@ class _MyImagePageState extends State<MyImagePage>{
     });
   }
 
+  // 画像保存処理
+  void _onSave(TapUpDetails details){
+    // CanvasElement canvas = document.query('#canvas');
+    // String dataUrl = canvas.toDataUrl();
+    // var picture = recorder.endRecording();
+    // var image =picture.toImage(lastSize.width.round(), lastSize.height.round());
+    // ByteData data = await image.toByteData(format: ui.ImageByteFormat.png);
+    // data.buffer.asUint8List();
+  }
+
+  // アイコンの大きさを変更する処理
   double basescale = 1;
   void _onScaleUpdate(ScaleUpdateDetails details) {
     setState(() {
@@ -305,8 +325,6 @@ class _MyImagePageState extends State<MyImagePage>{
   void _onScaleStart(ScaleStartDetails details){
     basescale = nowMark.scale;
   }
-
-
 }
 
 
@@ -380,8 +398,8 @@ class Mark {
   void drawLabel(Canvas canvas){
     Paint paint = Paint()
       ..isAntiAlias = true
-      ..color = Colors.blue //いる
-      ..strokeWidth = 5.0 //いる
+      ..color = Colors.blue
+      ..strokeWidth = 5.0
       ..style = PaintingStyle.stroke;
     Rect r = new Rect.fromLTWH(this.offset.dx, this.offset.dy, 30, 5);
     canvas.drawRect(r, paint);
