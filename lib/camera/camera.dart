@@ -118,7 +118,9 @@ class _MyImagePageState extends State<MyImagePage>{
               // 写真表示箇所
               GestureDetector(
                 onTapUp: _onTapUp,
+                onLongPressStart: _onLongPressStart,
                 onLongPressMoveUpdate: _onPointerMove,
+                onLongPressEnd: _onLongPressEnd,
                 onScaleUpdate: _onScaleUpdate,
                 onScaleEnd: _onScaleEnd,
                 onScaleStart: _onScaleStart,
@@ -131,13 +133,15 @@ class _MyImagePageState extends State<MyImagePage>{
                     color: Colors.grey,
                     height: mediasize.height*0.7,
                     width: mediasize.width,
+                    
                   ),
                 ),
               ),
               // 画像加工完了ボタン
               Row(children: <Widget>[
-                Expanded(child: Container(
-                    child: Icon(Icons.close)
+                Expanded(child: GestureDetector(
+                    child: Icon(Icons.close),
+                    onTapUp: _onReset,
                   ),
                 ),
                 Expanded(child: Container(
@@ -228,29 +232,61 @@ class _MyImagePageState extends State<MyImagePage>{
 
   Mark nowMark = null;
   List<Mark> marks = new List<Mark>();
+  var longPressFlag = false;
+  var bindIcon;
 
+  // タップが離れたときの処理
   void _onTapUp(TapUpDetails details) {
     RenderBox referenceBox = _canvasKey.currentContext.findRenderObject();
-    print('referenceBox');
-    print(referenceBox);
-    print(referenceBox.globalToLocal(details.globalPosition));
-    nowMark = new Mark(referenceBox.globalToLocal(details.globalPosition), 20 , selectMark);
-    setState(() {
-      marks.add(nowMark);
-    });
-    
-    setState(() {
-      marks.add(nowMark);
-    });
-
-    //受け取る値を代入する変数を定義
+    // ロングタップを防ぐための分岐
+    if(longPressFlag == false){
+      nowMark = new Mark(referenceBox.globalToLocal(details.globalPosition), 20 , selectMark);
+      setState(() {
+        marks.add(nowMark);
+      });
+    }
+    // 画面から指が離れたときフラグを解除する
+    longPressFlag = false;
   }
+
+  // ロングタップを検知して、アイコンを移動できるフラグを変更
+  void _onLongPressStart(LongPressStartDetails details){
+    RenderBox referenceBox = _canvasKey.currentContext.findRenderObject();
+    var touchPostion = referenceBox.globalToLocal(details.globalPosition);
+    // タップした箇所にアイコンがあるか判定
+    Iterable inReverse = marks.reversed;
+    var marksInReverse = inReverse.toList();
+    bindIcon = marksInReverse.lastWhere((icon) => 
+      sqrt(pow((icon.offset.dx - touchPostion.dx).abs().toDouble(), 2) + pow((icon.offset.dy - touchPostion.dy).abs().toDouble(), 2)) < 20);
+    setState(() {
+      longPressFlag = true;  
+      //対象のアイコンがある場合は大きくする処理
+    });
+  }
+
+  // ロングタップを終了したとき
+  void _onLongPressEnd(LongPressEndDetails details){
+    setState(() {
+      longPressFlag = false;
+    });
+  }
+
+  // ロングタップ中に移動させる処理
   void _onPointerMove(LongPressMoveUpdateDetails details) {
     RenderBox referenceBox = _canvasKey.currentContext.findRenderObject();
+    var touchPostion = referenceBox.globalToLocal(details.globalPosition);
     setState(() {
+        // 要素を移動させる処理
+        bindIcon.offset = touchPostion;
     });
   }
 
+  // リセット処理
+  void _onReset(TapUpDetails details){
+    setState(() {
+      marks = List<Mark>();
+    });
+  }
 
   double basescale = 1;
   void _onScaleUpdate(ScaleUpdateDetails details) {
@@ -298,7 +334,7 @@ class Mark {
 
   void drawS(Canvas canvas){
     var textStyle = TextStyle(
-      color: Colors.black,
+      color: Colors.blue,
       fontSize: 20,
     );
     var textSpan = TextSpan(
@@ -318,7 +354,7 @@ class Mark {
 
   void drawG(Canvas canvas){
     var textStyle = TextStyle(
-      color: Colors.black,
+      color: Colors.blue,
       fontSize: 20,
     );
     var textSpan = TextSpan(
