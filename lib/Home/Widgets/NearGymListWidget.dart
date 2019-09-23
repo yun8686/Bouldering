@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:bouldering_sns/GymDetail/GymList.dart';
+import 'package:bouldering_sns/GymDetail/GymGradeListWidget.dart';
 import 'package:bouldering_sns/Home/Widgets/GymRowData.dart';
 import 'package:bouldering_sns/Library/SharedPreferences.dart';
 import 'package:flutter/material.dart';
@@ -82,7 +82,7 @@ class _NearGymListState extends State<NearGymListWidget> {
       distance: gymRowData.distance,
       onTap: (){
         Navigator.push(context, new MaterialPageRoute<Null>(
-          builder: (BuildContext context) => GymListWidget(title: gymRowData.name, placeId: gymRowData.placeId,),
+          builder: (BuildContext context) => GymGradeListWidget(title: gymRowData.name, placeId: gymRowData.placeId,),
         ));
       },
       leadIconButton: IconButton(

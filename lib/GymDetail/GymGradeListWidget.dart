@@ -1,14 +1,15 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bouldering_sns/GymDetail/ProblemDetail.dart';
+import 'package:bouldering_sns/GymDetail/ProblemDetailWidget.dart';
+import 'package:bouldering_sns/GymDetail/ProblemListWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class GymListWidget extends StatelessWidget {
+class GymGradeListWidget extends StatelessWidget {
   String title, placeId;
 
-  GymListWidget({this.title, this.placeId}) {
+  GymGradeListWidget({this.title, this.placeId}) {
   }
 
   @override
@@ -20,15 +21,13 @@ class GymListWidget extends StatelessWidget {
             _AppbarWidget(title: title, placeId: placeId),
             SliverList(
               delegate:new SliverChildListDelegate(<Widget>[
-                _createGradeListTile(context, "3級"),
-                _createGradeListTile(context, "2級"),
-                _createGradeListTile(context, "1級"),
-                _createGradeListTile(context, "3級"),
-                _createGradeListTile(context, "2級"),
-                _createGradeListTile(context, "1級"),
-                _createGradeListTile(context, "3級"),
-                _createGradeListTile(context, "2級"),
-                _createGradeListTile(context, "1級"),
+                _createGradeListTile(context, "10級"),
+                _createGradeListTile(context, "9級"),
+                _createGradeListTile(context, "8級"),
+                _createGradeListTile(context, "7級"),
+                _createGradeListTile(context, "6級"),
+                _createGradeListTile(context, "5級"),
+                _createGradeListTile(context, "4級"),
                 _createGradeListTile(context, "3級"),
                 _createGradeListTile(context, "2級"),
                 _createGradeListTile(context, "1級"),
@@ -44,15 +43,8 @@ class GymListWidget extends StatelessWidget {
     return _GradeListTile(
         name: name,
         onTap: () {
-          Navigator.push(
-              context,
-              CupertinoPageRoute<Null>(
-                builder: (BuildContext context) =>
-                    ProblemDetailWidget(
-                        name: name,
-                        title: this.title,
-                        placeId: this.placeId),
-              ));
+//          Navigator.push(context,CupertinoPageRoute<Null>(builder: (BuildContext context) => ProblemDetailWidget(name: name,title: this.title,placeId: this.placeId)));
+          Navigator.push(context,CupertinoPageRoute<Null>(builder: (BuildContext context) => ProblemListWidget(title: name)));
         });
   }
 }
@@ -108,26 +100,24 @@ class _GradeListTile extends StatelessWidget{
         image: AssetImage('assets/backgroundimages/login.jpg'),
         fit: BoxFit.fill,
       ),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-        Text(this.name,style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),),
-        Wrap(
-          spacing: 8.0,
-          children: <Widget>[
-            Chip(
-              label: Text('カチ'),
-            ),
-            Chip(
-              label: Text('スラブ'),
-            ),
-            Chip(
-              label: Text('足自由'),
-            )
-          ],
+      title: Text(this.name,style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),),
+      trailing: Container(
+          decoration: new BoxDecoration(
+            color: Colors.red,
+            borderRadius: BorderRadius.circular(24),
+          ),
+        child: Text("99",style: new TextStyle(
+          color: Colors.white,
+          fontSize: 12,
+          ),
+          textAlign: TextAlign.center
         ),
-      ],),
-      trailing: Icon(Icons.chevron_right),
+          padding: EdgeInsets.all(8),
+          constraints: BoxConstraints(
+            minWidth: 24,
+            minHeight: 24,
+          ),
+      ),
       onTap: this.onTap??(){
       },
     ),
@@ -159,7 +149,7 @@ class GymHeaderCard extends StatelessWidget {
                     }
                   }),
           onTap: this.onTap ?? () {},
-          title: new Text(this.title.toString()),
+          title: Text(this.title.toString()),
           trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
