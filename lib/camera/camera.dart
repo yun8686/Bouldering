@@ -233,8 +233,6 @@ class _MyImagePageState extends State<MyImagePage>{
   Mark nowMark = null;
   List<Mark> marks = new List<Mark>();
   var longPressFlag = false;
-  var bindIcon;
-
   // タップが離れたときの処理
   void _onTapUp(TapUpDetails details) {
     RenderBox referenceBox = _canvasKey.currentContext.findRenderObject();
@@ -245,19 +243,25 @@ class _MyImagePageState extends State<MyImagePage>{
         marks.add(nowMark);
       });
     }
-    // 画面から指が離れたときフラグを解除する
-    longPressFlag = false;
   }
 
   // ロングタップを検知して、アイコンを移動できるフラグを変更
   void _onLongPressStart(LongPressStartDetails details){
+    if(marks.length==0) return;
     RenderBox referenceBox = _canvasKey.currentContext.findRenderObject();
     var touchPostion = referenceBox.globalToLocal(details.globalPosition);
     // タップした箇所にアイコンがあるか判定
     Iterable inReverse = marks.reversed;
     var marksInReverse = inReverse.toList();
-    bindIcon = marksInReverse.lastWhere((icon) => 
-      sqrt(pow((icon.offset.dx - touchPostion.dx).abs().toDouble(), 2) + pow((icon.offset.dy - touchPostion.dy).abs().toDouble(), 2)) < 20);
+    nowMark = marksInReverse.lastWhere( (icon) =>
+      sqrt(pow((icon.offset.dx - touchPostion.dx).abs().toDouble(), 2) + pow((icon.offset.dy - touchPostion.dy).abs().toDouble(), 2)) < 20
+      ,orElse: () => null
+    );
+    if(nowMark == null){
+      return;
+    }
+    print('kara_nowMark');
+    print(nowMark);
     setState(() {
       longPressFlag = true;  
       //対象のアイコンがある場合は大きくする処理
@@ -273,11 +277,12 @@ class _MyImagePageState extends State<MyImagePage>{
 
   // ロングタップ中に移動させる処理
   void _onPointerMove(LongPressMoveUpdateDetails details) {
+    if(longPressFlag==false) return;
     RenderBox referenceBox = _canvasKey.currentContext.findRenderObject();
     var touchPostion = referenceBox.globalToLocal(details.globalPosition);
     setState(() {
         // 要素を移動させる処理
-        bindIcon.offset = touchPostion;
+        nowMark.offset = touchPostion;
     });
   }
 
