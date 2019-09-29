@@ -1,20 +1,40 @@
 import 'package:bouldering_sns/GymDetail/ProblemDetailWidget.dart';
 import 'package:bouldering_sns/GymDetail/ProblemMakeWidget.dart';
+import 'package:bouldering_sns/Model/Gym/Grade.dart';
+import 'package:bouldering_sns/Model/Gym/Problem.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class ProblemListWidget extends StatelessWidget {
-  String title;
-  ProblemListWidget({this.title});
+  Grade grade;
+  ProblemListWidget({this.grade}){
+  }
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(title: Text(title)),
-        body: ListView(
-          children: <Widget>[_ProblemListTile(name: "ランジ課題")],
+        appBar: AppBar(title: Text(grade.name)),
+        body: FutureBuilder(
+          future: Problem.getGradeProblemList(grade),
+          builder: (BuildContext context, AsyncSnapshot<List<Problem>> snapshot) {
+            if (snapshot.hasError)
+              return Text('Error: ${snapshot.error}');
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting: return new Text('Loading...');
+              default:
+                if(snapshot.data.length == 0){
+                  return Text('課題がありません。');
+                }else{
+                  return ListView(
+                    children: snapshot.data.map((Problem problem) {
+                      return _ProblemListTile(name: problem.title);
+                    }).toList().cast(),
+                  );
+                }
+            }
+          },
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),

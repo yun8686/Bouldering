@@ -1,91 +1,126 @@
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bouldering_sns/GymDetail/ProblemDetailWidget.dart';
 import 'package:bouldering_sns/GymDetail/ProblemListWidget.dart';
+import 'package:bouldering_sns/Model/Gym/Grade.dart';
+import 'package:bouldering_sns/Model/Gym/Gym.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_webservice/places.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class GymGradeListWidget extends StatelessWidget {
-  String title, placeId;
+class GymGradeListWidget extends StatefulWidget {
+  Gym gym;
+  GymGradeListWidget({this.gym});
 
-  GymGradeListWidget({this.title, this.placeId}) {
+  @override
+  State<GymGradeListWidget> createState() {
+    return _GymGradeListState(gym: gym);
   }
+}
 
+class _GymGradeListState extends State<GymGradeListWidget> {
+  Gym gym;
+  List<Grade> gradeList = List<Grade>();
+
+  _GymGradeListState({this.gym});
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Grade.getGymGradeList(gym.place_id).then((gradeList) {
+      setState((){
+        this.gradeList = gradeList;
+      });
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: CustomScrollView(
           slivers: <Widget>[
-            _AppbarWidget(title: title, placeId: placeId),
-            SliverList(
-              delegate:new SliverChildListDelegate(<Widget>[
-                _createGradeListTile(context, "10級"),
-                _createGradeListTile(context, "9級"),
-                _createGradeListTile(context, "8級"),
-                _createGradeListTile(context, "7級"),
-                _createGradeListTile(context, "6級"),
-                _createGradeListTile(context, "5級"),
-                _createGradeListTile(context, "4級"),
-                _createGradeListTile(context, "3級"),
-                _createGradeListTile(context, "2級"),
-                _createGradeListTile(context, "1級"),
-              ]),
-            ),
+            _AppbarWidget(gym: gym),
+            _GradeListWidget(gradeList: this.gradeList),
           ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: (){
+            showModalBottomSheet(context: context, builder: (BuildContext context){
+              return _CreateGradeModalWidget(
+                gym: gym,
+                doPop: (){
+                  Grade.getGymGradeList(gym.place_id).then((gradeList) {
+                    setState((){
+                      this.gradeList = gradeList;
+                    });
+                  });
+                },
+              );
+            });
+          },
         ),
       ),
     );
   }
-
-  Widget _createGradeListTile(BuildContext context, String name){
-    return _GradeListTile(
-        name: name,
-        onTap: () {
-//          Navigator.push(context,CupertinoPageRoute<Null>(builder: (BuildContext context) => ProblemDetailWidget(name: name,title: this.title,placeId: this.placeId)));
-          Navigator.push(context,CupertinoPageRoute<Null>(builder: (BuildContext context) => ProblemListWidget(title: name)));
-        });
-  }
 }
 
 class _AppbarWidget extends StatefulWidget{
-  String title, placeId;
-  _AppbarWidget({this.title, this.placeId});
+  Gym gym;
+  _AppbarWidget({this.gym});
   @override
-  _AppbarWidgetState createState() => _AppbarWidgetState(title:title, placeId:placeId);
+  _AppbarWidgetState createState() => _AppbarWidgetState(gym: this.gym);
 }
 class _AppbarWidgetState extends State<_AppbarWidget>{
+  Gym gym;
+  _AppbarWidgetState({this.gym});
+
   String title, placeId, imageUrl;
   double imageHeight = 256.0;
-  _AppbarWidgetState({this.title, this.placeId});
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    final places = new GoogleMapsPlaces(apiKey: "AIzaSyAz4vCzntcPH_mbDvBK28AIv8CFieswdT4");
-    places.getDetailsByPlaceId(placeId, language: "ja").then((val){
-      Size mediasize = MediaQuery.of(context).size;
-      setState((){
-        this.imageHeight = (mediasize.width.toInt()/val.result.photos[0].width.toInt())*val.result.photos[0].height;
-        this.imageUrl = places.buildPhotoUrl(photoReference: val.result.photos[0].photoReference, maxWidth: mediasize.width.toInt());
-      });
-    });
+    title = gym.name;
+    placeId = gym.place_id;
   }
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    Size mediasize = MediaQuery.of(context).size;
+    gym.setImageInfo(mediasize).then((gym){
+      if (mounted) setState(() {this.gym = gym;});
+    });
+
     return SliverAppBar(
       pinned: true,
-      expandedHeight: imageHeight,
+      expandedHeight: gym.imageHeight!=null?gym.imageHeight:imageHeight,
       title: Text(this.title),
       flexibleSpace: new FlexibleSpaceBar(
-        background: Image(fit: BoxFit.fitWidth, image: this.imageUrl!=null?NetworkImage(this.imageUrl):AssetImage('assets/backgroundimages/login.jpg')),
+        background: Image(fit: BoxFit.fitWidth, image: gym.imageUrl!=null?NetworkImage(gym.imageUrl):AssetImage('assets/backgroundimages/login.jpg')),
       ),
     );
   }
 
 }
+
+class _GradeListWidget extends StatelessWidget{
+  List<Grade> gradeList = List<Grade>();
+  _GradeListWidget({this.gradeList});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverList(
+      delegate:SliverChildListDelegate(this.gradeList.map((grade){
+        return _createGradeListTile(context, grade);
+      }).toList())
+    );
+  }
+  Widget _createGradeListTile(BuildContext context, Grade grade){
+    return _GradeListTile(
+        name: grade.name,
+        onTap: () {
+//          Navigator.push(context,CupertinoPageRoute<Null>(builder: (BuildContext context) => ProblemDetailWidget(name: name,title: this.title,placeId: this.placeId)));
+          Navigator.push(context,CupertinoPageRoute<Null>(builder: (BuildContext context) => ProblemListWidget(grade: grade)));
+        });
+  }
+}
+
 
 class _GradeListTile extends StatelessWidget{
   String name;
@@ -174,4 +209,54 @@ class GymHeaderCard extends StatelessWidget {
       throw 'Could not launch Maps';
     }
   }
+}
+
+class _CreateGradeModalWidget extends StatefulWidget{
+  Gym gym;
+  Function doPop;
+  _CreateGradeModalWidget({this.gym, this.doPop});
+  @override
+  State<_CreateGradeModalWidget> createState() {
+    return _CreateGradeModalState(gym: gym, doPop: doPop);
+  }
+}
+
+class _CreateGradeModalState extends State<_CreateGradeModalWidget>{
+  Gym gym;
+  Function doPop;
+
+  String name;
+  _CreateGradeModalState({this.gym, this.doPop});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+          children:[
+            Text("新しい級を登録"),
+            TextField(
+              decoration: InputDecoration(
+                hintText: '級を入力',
+                hintStyle: TextStyle(color: Colors.grey),
+              ),
+              onChanged: (text){
+                this.name = text;
+              },
+            ),
+            RaisedButton(
+              child: Text("登録"),
+              color: Colors.pink,
+              textColor: Colors.white,
+              onPressed: ()async{
+                await Grade.create(gym, this.name);
+                Navigator.pop(context);
+                this.doPop();
+              },
+            ),
+          ]
+      ),
+    );
+  }
+
 }

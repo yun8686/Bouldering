@@ -1,15 +1,23 @@
+import 'package:bouldering_sns/Model/Gym/Problem.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:meta/meta.dart';
 
 class ProblemMakeWidget extends StatefulWidget {
+  String gymId, gradeId;
+
+  ProblemMakeWidget({@required this.gymId, @required this.gradeId});
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
-    return _ProblemMakeWidgetState();
+    return _ProblemMakeWidgetState(gymId: gymId, gradeId: gradeId);
   }
 }
 class _ProblemMakeWidgetState extends State<ProblemMakeWidget>{
+  String title = "", comment = "";
+
+  String gymId, gradeId;
+  _ProblemMakeWidgetState({this.gymId, this.gradeId});
   @override
   Widget build(BuildContext context) {
     print("build");
@@ -23,6 +31,7 @@ class _ProblemMakeWidgetState extends State<ProblemMakeWidget>{
                   onPressed: () {
                     if(true){
                       print("ok");
+                      Problem(title: this.title, comment: comment, gym: gymId).create();
                     }else{
                       print("ng");
                     }
@@ -43,10 +52,13 @@ class _ProblemMakeWidgetState extends State<ProblemMakeWidget>{
                           Image(image: AssetImage('assets/backgroundimages/login.jpg'), width: 80.0, height:80.0),
                           Expanded(
                               child: TextField(
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: '課題'
-                                  )
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: '課題'
+                                ),
+                                onChanged: (value){
+                                  title = value;
+                                },
                               )
                           )
                         ],
@@ -65,7 +77,12 @@ class _ProblemMakeWidgetState extends State<ProblemMakeWidget>{
                           )
                         ],
                       ),
-                      _scrollableTextField(),
+                      _scrollableTextField(
+                        onChanged: (value){
+                          this.comment = value.replaceAll(RegExp(r'[\n\r]'), "\\n");
+                          print("trom " + this.comment + " trom");
+                        },
+                      ),
                     ],
                   ),
                 )))
@@ -76,14 +93,18 @@ class _ProblemMakeWidgetState extends State<ProblemMakeWidget>{
 
 
 class _scrollableTextField extends StatefulWidget {
+  Function(String) onChanged;
+  _scrollableTextField({this.onChanged});
 
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return _scrollableTextFieldState();
+    return _scrollableTextFieldState(onChanged: this.onChanged);
   }
 }
 class _scrollableTextFieldState extends State<_scrollableTextField>{
+  Function(String) onChanged;
+  _scrollableTextFieldState({this.onChanged});
   @override
   Widget build(BuildContext context) {
     return Expanded(child:ListView(
@@ -101,6 +122,7 @@ class _scrollableTextFieldState extends State<_scrollableTextField>{
             minLines: 3,
             maxLines: null,
             textAlign: TextAlign.left,
+            onChanged: this.onChanged,
           ),
         ),
       ],

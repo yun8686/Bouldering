@@ -1,10 +1,5 @@
-import 'dart:convert';
-
-import 'package:bouldering_sns/Home/Widgets/GymRowData.dart';
-import 'package:bouldering_sns/Library/SharedPreferences.dart';
+import 'package:bouldering_sns/Model/Gym/Gym.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_webservice/places.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FavoliteGymListWidget extends StatefulWidget {
@@ -26,7 +21,6 @@ class _FavoliteGymListParam{
 
 class _FavoliteGymListState extends State<FavoliteGymListWidget> {
   _FavoliteGymListParam params = null;
-  final places = new GoogleMapsPlaces(apiKey: "AIzaSyAz4vCzntcPH_mbDvBK28AIv8CFieswdT4");
 
   @override
   void initState() {
@@ -42,29 +36,23 @@ class _FavoliteGymListState extends State<FavoliteGymListWidget> {
 
   void showFavoliteGymList() async{
     List<Widget> newGymList = List<Widget>();
-    List<GymRowData> gymList = await MySharedPreferences.getFavoriteGym();
+    List<Gym> gymList = await Gym.getFavoriteGymList();
     if(gymList == null || gymList.length == 0) return;
-    gymList.forEach((gymRowData)=>newGymList.add(
+    gymList.forEach((gym)=>newGymList.add(
         ListTile(
-          onTap: (){print("listed");},
           leading: IconButton(
-              icon: gymRowData.favolite == 0?
+              icon: gym.favorite == 0?
                 Icon(Icons.star_border, color: Colors.grey,):
                 Icon(Icons.star, color: Colors.yellow,),
               onPressed: () async{
-                if(gymRowData.favolite == 0){
-                  await MySharedPreferences.addFavoliteGymPlaceid(gymRowData.placeId);
-                }else{
-                  await MySharedPreferences.removeFavoliteGymPlaceid(gymRowData.placeId);
-                }
-                print(gymRowData.placeId);
+                gym.setFavorite(!gym.favorite);
                 await showFavoliteGymList();
               }
           ),
-          title: new Text(gymRowData.name),
+          title: new Text(gym.name),
           trailing: IconButton(
             icon: Icon(Icons.map),
-            onPressed: () {_launchMaps(gymRowData.placeId);}
+            onPressed: () {_launchMaps(gym.place_id);}
           ),
         )
       )
@@ -88,13 +76,10 @@ class _FavoliteGymListState extends State<FavoliteGymListWidget> {
     List<Widget> widgets = new List<Widget>();
     widgets.add(Expanded(
       child: Container(
-          child: RefreshIndicator(
-              onRefresh: () async{
-                await updatePosition();
-              },
-              child: new ListView(
-                children: params._favoriteGymList,
-              ))),
+        child: new ListView(
+          children: params._favoriteGymList,
+        )
+      ),
     ));
     return widgets;
   }

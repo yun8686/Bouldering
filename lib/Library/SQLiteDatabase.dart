@@ -31,15 +31,16 @@ class SQLiteDatabase {
         newDb.execute("""
         CREATE TABLE ${Tables.NearGymList}
           (
-            placeId TEXT PRIMARY KEY,
+            place_id TEXT PRIMARY KEY,
             name TEXT,
-            distance double
+            distance double,
+            photo_url TEXT
           );
         """);
         newDb.execute("""
         CREATE TABLE ${Tables.FavoriteGymList}
           (
-            placeId TEXT PRIMARY KEY
+            place_id TEXT PRIMARY KEY
           );
         """);
       },

@@ -38,6 +38,8 @@ dependencies:
   auto_size_text: any
   flutter_signin_button: any
   bubble: any
+  tuple: any
+  meta: any
 
 dev_dependencies:
   flutter_test:
