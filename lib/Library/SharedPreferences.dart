@@ -1,5 +1,6 @@
 import 'package:bouldering_sns/Library/SQLiteDatabase.dart';
 import 'package:bouldering_sns/Model/Gym/Gym.dart';
+import 'package:bouldering_sns/Model/User/User.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -48,20 +49,15 @@ class MySharedPreferences{
     }).toList();
   }
 
-  static final String _FAVORITEGYMLIST = "FAVORITEGYMLIST";
   static Future<void> addFavoriteGymPlaceid(String place_id) async{
     Database database = await SQLiteDatabase.getDatabase();
-    await database.rawQuery(
-        "INSERT INTO ${Tables.FavoriteGymList} SELECT '${place_id}';"
-    );
+    await database.insert(Tables.FavoriteGymList, {
+      'place_id': place_id,
+    });
   }
   static Future<void> removeFavoriteGymPlaceid(String place_id) async{
     Database database = await SQLiteDatabase.getDatabase();
-    try{
-      await database.rawQuery(
-          "delete from ${Tables.FavoriteGymList} where place_id = '${place_id}';"
-      );
-    }catch(e){}
+    await database.delete(Tables.FavoriteGymList, where: 'place_id = ?', whereArgs: [place_id]);
   }
   static Future<List<Gym>> getFavoriteGymList() async{
     Database database = await SQLiteDatabase.getDatabase();
@@ -73,5 +69,31 @@ class MySharedPreferences{
       return Gym.fromDBMap(data);
     }).toList();
   }
-//  static
+
+  static Future<void> setFriendUserList(List<User> userList) async{
+    Database database = await SQLiteDatabase.getDatabase();
+    await database.delete(Tables.FriendUserList);
+    await Future.wait(userList.map((user){
+      return database.insert(Tables.FriendUserList, {
+        'user_id': user.key,
+        'displayName': user.displayName,
+      });
+    }));
+  }
+
+  static Future<void> removeFriendUserId(User user) async{
+    Database database = await SQLiteDatabase.getDatabase();
+    await database.delete(Tables.FriendUserList, where: 'user_id = ?', whereArgs: [user.key]);
+  }
+
+  static Future<List<User>> getFriendUserList() async{
+    Database database = await SQLiteDatabase.getDatabase();
+    List<Map> list = await database.query(Tables.FriendUserList);
+    return await list.map((data){
+      return User.fromDBMap(data);
+    }).toList();
+  }
+
+
+  //  static
 }

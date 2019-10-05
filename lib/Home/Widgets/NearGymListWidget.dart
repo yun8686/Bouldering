@@ -1,6 +1,7 @@
 import 'package:bouldering_sns/GymDetail/GymGradeListWidget.dart';
 import 'package:bouldering_sns/Model/Gym/Gym.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NearGymListWidget extends StatefulWidget {
   NearGymListWidget({Key key}) : super(key: key);
@@ -71,8 +72,8 @@ class _NearGymListState extends State<NearGymListWidget> {
     );
   }
 
-  GymHeaderCard listCard(Gym gym) {
-    return GymHeaderCard(
+  _GymHeaderCard listCard(Gym gym) {
+    return _GymHeaderCard(
       title: gym.name,
       placeId: gym.place_id,
       distance: gym.distance,
@@ -103,5 +104,57 @@ class _NearGymListState extends State<NearGymListWidget> {
             });
           }),
     );
+  }
+}
+
+
+
+class _GymHeaderCard extends StatelessWidget {
+  String title, placeId;
+  double distance;
+  IconButton leadIconButton;
+  void Function() onTap;
+  _GymHeaderCard({this.title, this.placeId, this.leadIconButton, this.onTap, this.distance});
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Card(
+        child: ListTile(
+          leading: this.leadIconButton ??
+              IconButton(
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () async {
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    }
+                  }),
+          onTap: this.onTap ?? () {},
+          title: Text(this.title.toString()),
+          trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                distance!=null?Text("${(distance.toStringAsFixed(1))}km"):Text("0km"),
+                IconButton(
+                    icon: Icon(Icons.map),
+                    onPressed: () {
+                      _launchMaps(this.placeId);
+                    }),
+              ]
+          ),
+        ));
+  }
+
+  void _launchMaps(String placeId) async {
+    String url =
+        'https://www.google.com/maps/search/?api=1&query=Google&query_place_id=' +
+            placeId;
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch Maps';
+    }
   }
 }

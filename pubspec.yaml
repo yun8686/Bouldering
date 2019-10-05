@@ -40,6 +40,7 @@ dependencies:
   bubble: any
   tuple: any
   meta: any
+  flutter_picker: any
 
 dev_dependencies:
   flutter_test:

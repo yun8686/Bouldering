@@ -1,23 +1,38 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:bouldering_sns/Model/Chat/Chat.dart';
+import 'package:bouldering_sns/Model/User/User.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:bubble/bubble.dart';
 
 class ChatWidget extends StatefulWidget {
-  String user = "";
-  ChatWidget(this.user);
+  User rightUser, leftUser;
+  Chat chat;
+  ChatWidget({this.rightUser, this.leftUser}){
+    chat = Chat(
+      rightUser: this.rightUser,
+      leftUser: this.leftUser,
+    );
+  }
   @override
-  ChatWidgetState createState() => ChatWidgetState(this.user);
+  ChatWidgetState createState() => ChatWidgetState(chat:chat);
 }
 
 class ChatWidgetState extends State<ChatWidget> {
-  String user = "";
-  ChatWidgetState(this.user);
+  Chat chat;
+  ChatWidgetState({this.chat});
+
+  String message = "";
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-
     double pixelRatio = MediaQuery.of(context).devicePixelRatio;
     double px = 1 / pixelRatio;
     this.styleSomebody = BubbleStyle(
@@ -37,7 +52,7 @@ class ChatWidgetState extends State<ChatWidget> {
 
     return Scaffold(
         appBar: AppBar(
-            title: Text(this.user),
+            title: Text(this.chat.leftUser.displayName),
             automaticallyImplyLeading: true,
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
@@ -48,9 +63,8 @@ class ChatWidgetState extends State<ChatWidget> {
                 children: <Widget>[
                   Expanded(
                       child: Container(
-                          child: ListView(
-                            children: createChatRows(),
-                  ))),
+                          child: createChatRows(),
+                  )),
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Padding(
@@ -59,11 +73,16 @@ class ChatWidgetState extends State<ChatWidget> {
                           child: Row(
                             children: <Widget>[
                               Flexible(
-                                child: TextField(minLines: 1, maxLines: 10),
+                                child: TextField(minLines: 1, maxLines: 10, onChanged: (value){
+                                  this.message = value;
+                                },),
                               ),
                               Material(
                                   child: IconButton(
-                                icon: Icon(Icons.send),
+                                    icon: Icon(Icons.send),
+                                    onPressed: (){
+                                      chat.sendChat(message);
+                                    },
                               )),
                             ],
                           ),
@@ -76,12 +95,25 @@ class ChatWidgetState extends State<ChatWidget> {
     );
   }
 
-  List<Widget> createChatRows(){
-    List<Widget> chatRows = List<Widget>();
-    for(int i=1;i<=50;i++){
-      chatRows.add(createChatRow("発言" + i.toString() ,  i%3==0));
-    }
-    return chatRows;
+  StreamBuilder<QuerySnapshot> createChatRows(){
+    return StreamBuilder<QuerySnapshot>(
+      stream: chat.getChatStream(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot){
+        if(!snapshot.hasData || snapshot.data.documents.length == 0){
+          return const Text('Loading...');
+        }else{
+          List<Widget> list = List<Widget>();
+          snapshot.data.documents.forEach((document){
+            if(document.data["creator"] != chat.leftUser.key){
+              list.add(createChatRow(document.data["message"], false));
+            }else{
+              list.add(createChatRow(document.data["message"], true));
+            }
+          });
+          return ListView(children: list.reversed.toList());
+        }
+      },
+    );
   }
 
   BubbleStyle styleSomebody, styleMe;
@@ -89,11 +121,15 @@ class ChatWidgetState extends State<ChatWidget> {
     List<Widget> row = List<Widget>();
     if(!isMe){
       row.add(CircleAvatar(
-        backgroundImage: new NetworkImage(
+        backgroundImage: NetworkImage(
             "https://booth.pximg.net/c3d42cdb-5e97-43ff-9331-136453807f10/i/616814/d7def86b-1d95-4f2d-ad9c-c0c218e6a533_base_resized.jpg"),
       ));
     }
-    row.add(Expanded(child: Bubble(style: isMe?this.styleMe:this.styleSomebody, child: Text(text))));
+    if(isMe){
+      row.add(Expanded(child: Bubble(style: this.styleMe, child: Text(text))));
+    }else{
+      row.add(Expanded(child: Bubble(style: this.styleSomebody, child: Text(text))));
+    }
     return Row(
       children: row,
     );

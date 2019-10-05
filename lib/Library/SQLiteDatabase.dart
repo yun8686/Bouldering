@@ -5,7 +5,7 @@ import 'package:sqflite/sqflite.dart';
 class Tables{
   static final String NearGymList = "NearGymList";
   static final String FavoriteGymList = "FavoriteGymList";
-
+  static final String FriendUserList = "FriendUserList";
 }
 
 class SQLiteDatabase {
@@ -41,6 +41,13 @@ class SQLiteDatabase {
         CREATE TABLE ${Tables.FavoriteGymList}
           (
             place_id TEXT PRIMARY KEY
+          );
+        """);
+        newDb.execute("""
+        CREATE TABLE ${Tables.FriendUserList}
+          (
+            user_id TEXT PRIMARY KEY,
+            displayName TEXT
           );
         """);
       },

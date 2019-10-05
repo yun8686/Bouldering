@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bouldering_sns/Chat/ChatWidget.dart';
+import 'package:bouldering_sns/Model/User/User.dart';
 import 'package:flutter/material.dart';
 
 class FriendsWidget extends StatefulWidget {
@@ -9,7 +10,40 @@ class FriendsWidget extends StatefulWidget {
 }
 
 class FriendsWidgetState extends State<FriendsWidget> {
-  bool showSearchArea = false;
+  User loginUser;
+  List<User> friendUserList = List<User>();
+  List<User> nearUserList = List<User>();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setLoginUser().then((user){
+      setFriendUserList();
+      setNearUserList();
+    });
+  }
+  Future<User> setLoginUser(){
+    return User.getLoginUser().then((user){
+      this.loginUser = user;
+      return user;
+    });
+  }
+  void setFriendUserList(){
+    User.getFriendUserList(true).then((userList){
+      setState(() {
+        this.friendUserList = userList;
+      });
+    });
+  }
+  void setNearUserList(){
+    User.nearUserList().then((userList){
+      setState(() {
+        this.nearUserList = userList;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -19,12 +53,8 @@ class FriendsWidgetState extends State<FriendsWidget> {
                 title: Text("トーク"),
                 actions: <Widget>[
                   IconButton(
-                    // 検索テキスト開閉
-                    icon: Icon(Icons.search),
+                    icon: Icon(Icons.settings),
                     onPressed: () {
-                      this.setState(() {
-                        this.showSearchArea = !this.showSearchArea;
-                      });
                     },
                   )
                 ],
@@ -42,69 +72,65 @@ class FriendsWidgetState extends State<FriendsWidget> {
     );
   }
 
+  Widget getSearchArea(){
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: "検索",
+          filled: true,
+          border: InputBorder.none,
+          suffixIcon: IconButton(
+            icon: Icon(Icons.search),
+            onPressed: (){},
+          )
+        ),
+      )
+    );
+  }
+
   List<Widget> getFriendsWidgets() {
     List<Widget> widgets = new List<Widget>();
-    if (this.showSearchArea) widgets.add(searchAreaText());
+    widgets.add(getSearchArea());
     widgets.add(Expanded(
       child: Container(
-          child: RefreshIndicator(
-              onRefresh: _onRefresh,
-              child: new ListView(
-                children: userList("たかしくん"),
-              ))),
+        child: ListView(
+          children: nearUserList.map((user){return UserTile(user);}).toList(),
+        ),
+      ),
     ));
     return widgets;
   }
 
   List<Widget> getNearByWidgets() {
     List<Widget> widgets = new List<Widget>();
-    if (this.showSearchArea) widgets.add(searchAreaText());
     widgets.add(Expanded(
       child: Container(
           child: RefreshIndicator(
-              onRefresh: _onRefresh,
+              onRefresh: (){},
               child: new ListView(
-                children: userList("けんじくん"),
-              ))),
+                children: nearUserList.map((user){return UserTile(user);}).toList(),
+              )
+          )
+      ),
     ));
     return widgets;
   }
 
-  List<Widget> userList(String name) {
-    List<Widget> users = new List<Widget>();
-    for (int i = 1; i <= 100; i++) {
-      users.add(new ListTile(
-        leading: new CircleAvatar(
-          backgroundImage: new NetworkImage(
-              "https://booth.pximg.net/c3d42cdb-5e97-43ff-9331-136453807f10/i/616814/d7def86b-1d95-4f2d-ad9c-c0c218e6a533_base_resized.jpg"),
-        ),
-        title: new Text(name + i.toString()),
-        onTap: () {
-          Navigator.push(
-              context,
-              new MaterialPageRoute<Null>(
-                builder: (BuildContext context) =>
-                    new ChatWidget(name + i.toString()),
-              ));
-        },
-      ));
-    }
-    return users;
-  }
-
-  //
-  Future<void> _onRefresh() async {
-    setState(() {
-      this.showSearchArea = true;
-    });
-  }
-
-  TextField searchAreaText() {
-    return new TextField(
-        maxLines: 1,
-        decoration: const InputDecoration(
-          hintText: "search..",
-          labelText: "search",
-        ));
+  Widget UserTile(User user){
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(
+            "https://booth.pximg.net/c3d42cdb-5e97-43ff-9331-136453807f10/i/616814/d7def86b-1d95-4f2d-ad9c-c0c218e6a533_base_resized.jpg"),
+      ),
+      title: Text(user.displayName),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute<Null>(
+            builder: (BuildContext context) => ChatWidget(leftUser: user,rightUser: loginUser),
+          ));
+      },
+    );
   }
 }

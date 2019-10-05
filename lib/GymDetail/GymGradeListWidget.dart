@@ -4,6 +4,7 @@ import 'package:bouldering_sns/Model/Gym/Gym.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_picker/flutter_picker.dart';
 
 class GymGradeListWidget extends StatefulWidget {
   Gym gym;
@@ -16,6 +17,7 @@ class GymGradeListWidget extends StatefulWidget {
 }
 
 class _GymGradeListState extends State<GymGradeListWidget> {
+  bool showAll = false;
   Gym gym;
   List<Grade> gradeList = List<Grade>();
 
@@ -37,23 +39,14 @@ class _GymGradeListState extends State<GymGradeListWidget> {
         body: CustomScrollView(
           slivers: <Widget>[
             _AppbarWidget(gym: gym),
-            _GradeListWidget(gradeList: this.gradeList),
+            _GradeListWidget(gradeList: this.gradeList.where((g){return showAll||g.count!=0;}).toList()),
           ],
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           onPressed: (){
-            showModalBottomSheet(context: context, builder: (BuildContext context){
-              return _CreateGradeModalWidget(
-                gym: gym,
-                doPop: (){
-                  Grade.getGymGradeList(gym.place_id).then((gradeList) {
-                    setState((){
-                      this.gradeList = gradeList;
-                    });
-                  });
-                },
-              );
+            setState(() {
+              this.showAll = !this.showAll;
             });
           },
         ),
@@ -113,7 +106,7 @@ class _GradeListWidget extends StatelessWidget{
   }
   Widget _createGradeListTile(BuildContext context, Grade grade){
     return _GradeListTile(
-        name: grade.name,
+        grade: grade,
         onTap: () {
 //          Navigator.push(context,CupertinoPageRoute<Null>(builder: (BuildContext context) => ProblemDetailWidget(name: name,title: this.title,placeId: this.placeId)));
           Navigator.push(context,CupertinoPageRoute<Null>(builder: (BuildContext context) => ProblemListWidget(grade: grade)));
@@ -123,9 +116,9 @@ class _GradeListWidget extends StatelessWidget{
 
 
 class _GradeListTile extends StatelessWidget{
-  String name;
+  Grade grade;
   void Function() onTap;
-  _GradeListTile({this.name, this.onTap});
+  _GradeListTile({this.grade, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -135,13 +128,13 @@ class _GradeListTile extends StatelessWidget{
         image: AssetImage('assets/backgroundimages/login.jpg'),
         fit: BoxFit.fill,
       ),
-      title: Text(this.name,style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),),
+      title: Text(grade.name,style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),),
       trailing: Container(
           decoration: new BoxDecoration(
             color: Colors.red,
             borderRadius: BorderRadius.circular(24),
           ),
-        child: Text("99",style: new TextStyle(
+        child: Text(grade.count.toString(),style: new TextStyle(
           color: Colors.white,
           fontSize: 12,
           ),
@@ -160,103 +153,3 @@ class _GradeListTile extends StatelessWidget{
   }
 }
 
-
-class GymHeaderCard extends StatelessWidget {
-  String title, placeId;
-  double distance;
-  IconButton leadIconButton;
-  void Function() onTap;
-  GymHeaderCard({this.title, this.placeId, this.leadIconButton, this.onTap, this.distance});
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return Card(
-            child: ListTile(
-          leading: this.leadIconButton ??
-              IconButton(
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.grey,
-                  ),
-                  onPressed: () async {
-                    if (Navigator.canPop(context)) {
-                      Navigator.pop(context);
-                    }
-                  }),
-          onTap: this.onTap ?? () {},
-          title: Text(this.title.toString()),
-          trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                distance!=null?Text("${(distance.toStringAsFixed(1))}km"):Text("0km"),
-              IconButton(
-                icon: Icon(Icons.map),
-                onPressed: () {
-                  _launchMaps(this.placeId);
-                }),
-            ]
-          ),
-        ));
-  }
-
-  void _launchMaps(String placeId) async {
-    String url =
-        'https://www.google.com/maps/search/?api=1&query=Google&query_place_id=' +
-            placeId;
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch Maps';
-    }
-  }
-}
-
-class _CreateGradeModalWidget extends StatefulWidget{
-  Gym gym;
-  Function doPop;
-  _CreateGradeModalWidget({this.gym, this.doPop});
-  @override
-  State<_CreateGradeModalWidget> createState() {
-    return _CreateGradeModalState(gym: gym, doPop: doPop);
-  }
-}
-
-class _CreateGradeModalState extends State<_CreateGradeModalWidget>{
-  Gym gym;
-  Function doPop;
-
-  String name;
-  _CreateGradeModalState({this.gym, this.doPop});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-          children:[
-            Text("新しい級を登録"),
-            TextField(
-              decoration: InputDecoration(
-                hintText: '級を入力',
-                hintStyle: TextStyle(color: Colors.grey),
-              ),
-              onChanged: (text){
-                this.name = text;
-              },
-            ),
-            RaisedButton(
-              child: Text("登録"),
-              color: Colors.pink,
-              textColor: Colors.white,
-              onPressed: ()async{
-                await Grade.create(gym, this.name);
-                Navigator.pop(context);
-                this.doPop();
-              },
-            ),
-          ]
-      ),
-    );
-  }
-
-}
