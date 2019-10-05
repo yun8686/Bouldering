@@ -18,8 +18,6 @@ class _AuthEntranceState extends State<AuthEntranceWidget> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  String username = 'アプリをはじめよう';
-
   Future<FirebaseUser> _handleSignIn() async {
     final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
     final GoogleSignInAuthentication googleAuth =
@@ -30,13 +28,8 @@ class _AuthEntranceState extends State<AuthEntranceWidget> {
       idToken: googleAuth.idToken,
     );
 
-    final FirebaseUser user =
-        (await _auth.signInWithCredential(credential)).user;
-    setState(() {
-      username = user.displayName;
-    });
+    final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
     await MySharedPreferences.setFirebaseUID(user.uid);
-    print(username);
     await Firestore.instance.collection('users').document(user.uid).setData({
       'uid': user.uid,
       'email': user.email,
@@ -52,16 +45,14 @@ class _AuthEntranceState extends State<AuthEntranceWidget> {
   Future<void> _handleSignOut() async {
     _auth.signOut();
     setState(() {
-      username = 'Your name';
     });
   }
 
   Size size = null;
   @override
   Widget build(BuildContext context) {
-    if (this.size == null) this.size = MediaQuery.of(context).size;
+    this.size = MediaQuery.of(context).size;
     return Scaffold(
-//        resizeToAvoidBottomInset: false,
         body: Stack(children: <Widget>[
           Positioned.fill(
             child: Image(
@@ -91,6 +82,8 @@ class _AuthEntranceState extends State<AuthEntranceWidget> {
               Center(child: LoginAreaWidget()),
               SizedBox(height: 30),
               Center(child: SNSButtonSetWidget()),
+              SizedBox(height: 60),
+              Center(child: InfoAreaWidget()),
               SizedBox(height: 60),
             ],
           ),
@@ -199,4 +192,24 @@ class _AuthEntranceState extends State<AuthEntranceWidget> {
       ],
     );
   }
+
+  Widget InfoAreaWidget(){
+    return SizedBox(
+      width: size.width*0.9,
+      child:Card(
+        color: Color.fromARGB(30, Colors.grey.red, Colors.grey.green, Colors.grey.blue),
+        child:Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text("アカウントをお持ちではないですか？", style: TextStyle(fontStyle:FontStyle.italic ,fontSize: 20.0, color: Colors.white)),
+              GestureDetector(
+                child: Text("新規登録", style: TextStyle(decoration: TextDecoration.underline, fontStyle:FontStyle.italic ,fontSize: 20.0, color: Colors.white)),
+                onTap: (){},
+              ),
+            ],
+          ),
+      )
+    );
+  }
+
 }

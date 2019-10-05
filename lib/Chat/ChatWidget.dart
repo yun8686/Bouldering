@@ -104,7 +104,7 @@ class ChatWidgetState extends State<ChatWidget> {
         }else{
           List<Widget> list = List<Widget>();
           snapshot.data.documents.forEach((document){
-            if(document.data["creator"] != chat.leftUser.key){
+            if(document.data["creator"] == chat.leftUser.key){
               list.add(createChatRow(document.data["message"], false));
             }else{
               list.add(createChatRow(document.data["message"], true));
