@@ -269,8 +269,6 @@ class _MyImagePageState extends State<MyImagePage>{
     if(nowMark == null){
       return;
     }
-    print('kara_nowMark');
-    print(nowMark);
     setState(() {
       longPressFlag = true;  
       //対象のアイコンがある場合は大きくする処理
@@ -317,6 +315,8 @@ class _MyImagePageState extends State<MyImagePage>{
   void _onScaleUpdate(ScaleUpdateDetails details) {
     setState(() {
       nowMark.scale = details.scale*basescale;
+      print(nowMark);
+      // nowMark.fontSize = details.fontSize
     });
   }
   void _onScaleEnd(ScaleEndDetails details){
@@ -358,7 +358,7 @@ class Mark {
   void drawS(Canvas canvas){
     var textStyle = TextStyle(
       color: Colors.blue,
-      fontSize: 20,
+      fontSize: 2 * this.scale,
     );
     var textSpan = TextSpan(
       text: 'S',
@@ -378,7 +378,7 @@ class Mark {
   void drawG(Canvas canvas){
     var textStyle = TextStyle(
       color: Colors.blue,
-      fontSize: 20,
+      fontSize: 2 * this.scale,
     );
     var textSpan = TextSpan(
       text: 'G',
