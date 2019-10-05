@@ -396,13 +396,15 @@ class Mark {
   }
 
   void drawLabel(Canvas canvas){
-    Paint paint = Paint()
-      ..isAntiAlias = true
-      ..color = Colors.blue
-      ..strokeWidth = 5.0
-      ..style = PaintingStyle.stroke;
-    Rect r = new Rect.fromLTWH(this.offset.dx, this.offset.dy, 30, 5);
-    canvas.drawRect(r, paint);
+    var icon = Icons.label;
+    var builder = ui.ParagraphBuilder(ui.ParagraphStyle(
+      fontFamily: icon.fontFamily,
+      fontSize: 2 * this.scale,
+    ))
+      ..addText(String.fromCharCode(icon.codePoint));
+    var para = builder.build();
+    para.layout(const ui.ParagraphConstraints(width: 60));
+    canvas.drawParagraph(para, this.offset);
   }
 }
 
