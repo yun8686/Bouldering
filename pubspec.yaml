@@ -41,6 +41,7 @@ dependencies:
   tuple: any
   meta: any
   flutter_picker: any
+  firebase_messaging: 5.1.6
 
 dev_dependencies:
   flutter_test:

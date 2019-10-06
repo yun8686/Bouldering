@@ -1,6 +1,7 @@
 import 'package:bouldering_sns/Authentication/AuthEntranceWidget.dart';
 import 'package:bouldering_sns/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../Library/SharedPreferences.dart';
@@ -16,9 +17,6 @@ class SplashWidget extends StatefulWidget {
 }
 
 class _SplashWidgetState extends State<SplashWidget> {
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
   Widget afterWidget;
 
   @override
@@ -26,33 +24,22 @@ class _SplashWidgetState extends State<SplashWidget> {
     // TODO: implement initState
     super.initState();
     print("initState");
-    MySharedPreferences.getFirebaseUID().then((firebaseUID){
-      if(firebaseUID != null){
-        // ログイン済みの場合はMyApp
-        Navigator.of(context).pushReplacement(new MaterialPageRoute(
-          builder: (BuildContext context) => MyApp(),
-        ));
-      }else{
-        // 未ログインの場合はAuthEntrance
-        Navigator.of(context).pushReplacement(new MaterialPageRoute(
-          builder: (BuildContext context) => AuthEntranceWidget(),
-        ));
-      }
+    setNotification().then((instance_id){
+      print("instance_id: " + instance_id);
+      MySharedPreferences.getFirebaseUID().then((firebaseUID){
+        if(firebaseUID != null){
+          // ログイン済みの場合はMyApp
+          Navigator.of(context).pushReplacement(new MaterialPageRoute(
+            builder: (BuildContext context) => MyApp(),
+          ));
+        }else{
+          // 未ログインの場合はAuthEntrance
+          Navigator.of(context).pushReplacement(new MaterialPageRoute(
+            builder: (BuildContext context) => AuthEntranceWidget(),
+          ));
+        }
+      });
     });
-  }
-
-  Future<FirebaseUser> _handleSignIn() async {
-    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-    final AuthCredential credential = GoogleAuthProvider.getCredential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-
-    final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
-    print('ユーザー: $user.displayName');
-    return user;
   }
 
 
@@ -61,6 +48,42 @@ class _SplashWidgetState extends State<SplashWidget> {
     // TODO: implement build
     return Scaffold(
     );
+  }
+
+
+  // 通知設定
+  Future<String> setNotification()async{
+    FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+    await _firebaseMessaging.requestNotificationPermissions();
+    await _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print("onMessage: $message");
+      },
+//      onBackgroundMessage: myBackgroundMessageHandler,
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+      },
+    );
+    return await _firebaseMessaging.getToken();
+  }
+
+  Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) {
+    if (message.containsKey('data')) {
+      // Handle data message
+      final dynamic data = message['data'];
+
+    }
+
+    if (message.containsKey('notification')) {
+      // Handle notification message
+      final dynamic notification = message['notification'];
+    }
+
+    // Or do other work.
+    return Future<void>.value();
   }
 
 

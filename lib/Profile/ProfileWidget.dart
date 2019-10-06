@@ -1,6 +1,4 @@
-import 'package:bouldering_sns/Home/Widgets/FavolitGymListWidget.dart';
-import 'package:bouldering_sns/Home/Widgets/NearGymListWidget.dart';
-import 'package:bouldering_sns/Home/Widgets/UserPanelWidget.dart';
+import 'package:bouldering_sns/GymDetail/Widgets/UserPanelWidget.dart';
 import 'package:flutter/material.dart';
 
 class ProfileWidget extends StatelessWidget {
