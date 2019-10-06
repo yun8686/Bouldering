@@ -2,13 +2,13 @@ import 'package:bouldering_sns/Model/Gym/Gym.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class FavoliteGymListWidget extends StatefulWidget {
-  FavoliteGymListWidget({Key key}) : super(key: key);
+class FavoriteGymListWidget extends StatefulWidget {
+  FavoriteGymListWidget({Key key}) : super(key: key);
   @override
-  _FavoliteGymListState createState() => _FavoliteGymListState();
+  _FavoriteGymListState createState() => _FavoriteGymListState();
 }
 
-class _FavoliteGymListParam{
+class _FavoriteGymListParam{
   List<Widget> _favoriteGymList = <Widget>[
     ListTile(
       leading: new CircleAvatar(
@@ -19,22 +19,22 @@ class _FavoliteGymListParam{
   ];
 }
 
-class _FavoliteGymListState extends State<FavoliteGymListWidget> {
-  _FavoliteGymListParam params = null;
+class _FavoriteGymListState extends State<FavoriteGymListWidget> {
+  _FavoriteGymListParam params = null;
 
   @override
   void initState() {
     super.initState();
-    params = _FavoliteGymListParam();
+    params = _FavoriteGymListParam();
     // GPSの準備
-    showFavoliteGymList();
+    showFavoriteGymList();
   }
 
   void didChangeDependencies(){
     super.didChangeDependencies();
   }
 
-  void showFavoliteGymList() async{
+  void showFavoriteGymList() async{
     List<Widget> newGymList = List<Widget>();
     List<Gym> gymList = await Gym.getFavoriteGymList();
     if(gymList == null || gymList.length == 0) return;
@@ -46,7 +46,7 @@ class _FavoliteGymListState extends State<FavoliteGymListWidget> {
                 Icon(Icons.star, color: Colors.yellow,),
               onPressed: () async{
                 gym.setFavorite(!gym.favorite);
-                await showFavoliteGymList();
+                await showFavoriteGymList();
               }
           ),
           title: new Text(gym.name),
@@ -64,7 +64,7 @@ class _FavoliteGymListState extends State<FavoliteGymListWidget> {
     }
   }
   void updatePosition() async{
-    await showFavoliteGymList();
+    await showFavoriteGymList();
   }
 
   @override

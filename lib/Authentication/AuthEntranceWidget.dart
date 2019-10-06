@@ -199,17 +199,16 @@ class _AuthEntranceState extends State<AuthEntranceWidget> {
       child:Card(
         color: Color.fromARGB(30, Colors.grey.red, Colors.grey.green, Colors.grey.blue),
         child:Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text("アカウントをお持ちではないですか？", style: TextStyle(fontStyle:FontStyle.italic ,fontSize: 20.0, color: Colors.white)),
-              GestureDetector(
-                child: Text("新規登録", style: TextStyle(decoration: TextDecoration.underline, fontStyle:FontStyle.italic ,fontSize: 20.0, color: Colors.white)),
-                onTap: (){},
-              ),
-            ],
-          ),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text("アカウントをお持ちではないですか？", style: TextStyle(fontStyle:FontStyle.italic ,fontSize: 20.0, color: Colors.white)),
+            GestureDetector(
+              child: Text("新規登録", style: TextStyle(decoration: TextDecoration.underline, fontStyle:FontStyle.italic ,fontSize: 20.0, color: Colors.white)),
+              onTap: (){},
+            ),
+          ]
+        ),
       )
     );
   }
-
 }
