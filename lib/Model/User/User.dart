@@ -7,11 +7,14 @@ class User{
 
   String key;
   String displayName;
+  String notifyId;
 
-  User({this.key, this.displayName});
+  User({this.key, this.displayName, this.notifyId});
   User.fromDBMap(Map map){
     this.key = map["user_id"];
     this.displayName = map["displayName"];
+    this.notifyId = map["notifyId"];
+
   }
 
   static Future<User> getLoginUser()async{
@@ -21,6 +24,7 @@ class User{
         return User(
           key: onValue.data['uid'],
           displayName: onValue.data['displayName'],
+          notifyId: onValue.data['notifyId'],
         );
       }
     });
@@ -40,6 +44,7 @@ class User{
         users.add(User(
           key: value.data["uid"],
           displayName: value.data["displayName"].toString(),
+          notifyId: value.data["notifyId"].toString(),
         ));
       });
     });
@@ -53,10 +58,22 @@ class User{
         users.add(User(
           key: value.data["uid"],
           displayName: value.data["displayName"].toString(),
+          notifyId: value.data["notifyId"].toString(),
         ));
       });
     });
     MySharedPreferences.setFriendUserList(users);
     return users;
+  }
+
+
+  Future<User> setNotifyId(String notifyId) async{
+    if(this.notifyId != notifyId){
+      await collection.document(this.key).updateData({
+        'notifyId': notifyId,
+      });
+      this.notifyId = notifyId;
+    }
+    return this;
   }
 }

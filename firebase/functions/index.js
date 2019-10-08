@@ -14,3 +14,5 @@ exports.addMessage = functions.https.onCall((data, context) => {
 
     return { result: original };
 });
+
+exports.triggerMessages = require('./store_triggers/messages');

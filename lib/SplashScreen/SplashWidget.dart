@@ -1,4 +1,5 @@
 import 'package:bouldering_sns/Authentication/AuthEntranceWidget.dart';
+import 'package:bouldering_sns/Model/User/User.dart';
 import 'package:bouldering_sns/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -29,9 +30,13 @@ class _SplashWidgetState extends State<SplashWidget> {
       MySharedPreferences.getFirebaseUID().then((firebaseUID){
         if(firebaseUID != null){
           // ログイン済みの場合はMyApp
-          Navigator.of(context).pushReplacement(new MaterialPageRoute(
-            builder: (BuildContext context) => MyApp(),
-          ));
+          User.getLoginUser().then((User user){
+            user.setNotifyId(instance_id).then((v){
+              Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                builder: (BuildContext context) => MyApp(),
+              ));
+            });
+          });
         }else{
           // 未ログインの場合はAuthEntrance
           Navigator.of(context).pushReplacement(new MaterialPageRoute(
