@@ -38,6 +38,8 @@ class _MyImagePageState extends State<MyImagePage>{
   //　選択フラグ
   var pressAttention = new List.generate(4, (i)=>false);
   var selectMark = '';
+  // 画像が入っていない場合はtrueでカメラアイコンを表示
+  var _canShowCameraIcon = true;
 
   GlobalKey _canvasKey = GlobalKey();
 
@@ -45,128 +47,136 @@ class _MyImagePageState extends State<MyImagePage>{
   Widget build(BuildContext context) {
     mediasize = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(this.context),
-        ),
-        title: Text("編集中"),
-        actions: <Widget>[
-          FlatButton(
-          textColor: Colors.white,
-          onPressed: () {},
-          child: Text("次へ"),
-          shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
-        ),
-      ],
-     ),
-      body: SafeArea(
-        child: GestureDetector(
-          child:Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              // マーク選択
-              Row(children: <Widget>[
-                  Expanded(
-                    child: Center(
-                      child:FlatButton(
-                        child: Text("S",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: pressAttention[0] ?  Colors.blue: Color(0xFF303030),
-                            )
-                        ),
-                        onPressed:() => setState(() => selectArtIcon(0,'start')),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child:FlatButton(
-                        child: Text("G",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: pressAttention[1] ? Colors.blue: Color(0xFF303030),
-                            )
-                        ),
-                      onPressed:() => setState(() => selectArtIcon(1,'gole')),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: GestureDetector(
-                        child: RotationTransition(
-                          child: Icon(
-                            Icons.radio_button_unchecked,
-                            color: pressAttention[2] ? Colors.blue: Color(0xFF303030),
-                          ),
-                          turns: new AlwaysStoppedAnimation(135 / 360),
-                        ),
-                        onTap:() => setState(() => selectArtIcon(2,'maru')),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: GestureDetector(
-                        child: RotationTransition(
-                          child: Icon(
-                            Icons.label_outline,
-                            color: pressAttention[3] ? Colors.blue: Color(0xFF303030),
-                          ),
-                          turns: new AlwaysStoppedAnimation(135 / 360),
-                        ),
-                        onTap:() => setState(() => selectArtIcon(3,'label')),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              // 写真表示箇所
-              GestureDetector(
-                onTapUp: _onTapUp,
-                onLongPressStart: _onLongPressStart,
-                onLongPressMoveUpdate: _onPointerMove,
-                onLongPressEnd: _onLongPressEnd,
-                onScaleUpdate: _onScaleUpdate,
-                onScaleEnd: _onScaleEnd,
-                onScaleStart: _onScaleStart,
-                child:SafeArea(
-                  child: Container(
-                    child: CustomPaint(
-                      key: _canvasKey,
-                      painter: ImagePainter(targetimage, marks, imageFile),
-                    ),
+      body: 
+      Stack(
+        children: <Widget>[
+          SafeArea(
+          child: GestureDetector(
+            child:Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  height: 40,
+                  decoration: new BoxDecoration(
                     color: Colors.grey,
-                    height: mediasize.height*0.7,
-                    width: mediasize.width,
-                    
+                  ),
+                  child:Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      // 戻るアイコン
+                      SizedBox(
+                        height: 40,
+                        width: MediaQuery.of(context).size.width * 0.2,
+                        child: IconButton(
+                          color: Colors.grey,
+                          icon: Icon(
+                            Icons.arrow_back,
+                            color: Colors.black,
+                          ),
+                          onPressed: () => Navigator.pop(this.context),
+                        ),
+                      ),
+                      // 余白の分
+                      SizedBox(
+                        height: 40,
+                        width: MediaQuery.of(context).size.width * 0.4,
+                      ),
+                      // スタンプを開くアイコン
+                      SizedBox(
+                        height: 40,
+                        width: MediaQuery.of(context).size.width * 0.2,
+                        child: IconButton(
+                          color: Colors.grey,
+                          icon: Icon(
+                            Icons.tag_faces,
+                            color: Colors.white),
+                          onPressed: () => _showModalIcon(),
+                        ),
+                      ),
+                      // 完了するボタン
+                      SizedBox(
+                        height: 40,
+                        width: MediaQuery.of(context).size.width * 0.2,
+                        child: IconButton(
+                          color: Colors.grey,
+                          icon: Icon(
+                            Icons.done,
+                            color: Colors.white),
+                          onPressed: () => _onSave,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              // 画像加工完了ボタン
-              Row(children: <Widget>[
-                Expanded(child: GestureDetector(
-                    child: Icon(Icons.close),
-                    onTapUp: _onReset,
+                // 写真表示箇所
+                GestureDetector(
+                  onTapUp: _onTapUp,
+                  onLongPressStart: _onLongPressStart,
+                  onLongPressMoveUpdate: _onPointerMove,
+                  onLongPressEnd: _onLongPressEnd,
+                  onScaleUpdate: _onScaleUpdate,
+                  onScaleEnd: _onScaleEnd,
+                  onScaleStart: _onScaleStart,
+                  child:SafeArea(
+                    child: Container(
+                      child: CustomPaint(
+                        key: _canvasKey,
+                        painter: ImagePainter(targetimage, marks, imageFile),
+                      ),
+                      color: Colors.grey,
+                      height: mediasize.height - 64,
+                      width: mediasize.width,
+                    ),
                   ),
                 ),
-                Expanded(child: GestureDetector(
-                    child: Icon(Icons.check_box),
-                    onTapUp: _onSave,
-                  ),
-                ),
-              ])
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-      // 編集ボタン
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showModalBottomSheet,
-        child: Icon(Icons.playlist_add),
-      ),
+        // カメラアイコン
+        Positioned(
+          left: MediaQuery.of(context).size.width * 0.5 - 32,
+          top: MediaQuery.of(context).size.height * 0.5 - 30,
+          child: _canShowCameraIcon
+            ? IconButton(
+            color: Colors.grey,
+            icon: Icon(
+              Icons.camera_alt,
+              color: Colors.black,
+              size: 50
+            ),
+            onPressed: () => _showModalSelectImage(),
+          ) : SizedBox(),
+        ),
+        // 一つ戻るアイコン
+        Positioned(
+          left: 30,
+          bottom: 20,
+          child: IconButton(
+            color: Colors.grey,
+            icon: Icon(
+              Icons.replay,
+              color: Colors.black,
+              size: 30
+            ),
+            onPressed: () => _onLastRemove(),
+          ),
+        ),
+        // 保存するアイコン
+        Positioned(
+          right: 30,
+          bottom: 20,
+          child: IconButton(
+            color: Colors.black,
+            icon: Icon(
+              Icons.done,
+              color: Colors.black,
+              size: 30
+            ),
+            onPressed: () => _onSave,
+          ),
+        ),
+      ]),
     );
   }
   
@@ -178,7 +188,7 @@ class _MyImagePageState extends State<MyImagePage>{
     selectMark = name;
   }
 
-  void _showModalBottomSheet() {
+  void _showModalSelectImage() {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -190,7 +200,9 @@ class _MyImagePageState extends State<MyImagePage>{
               title: Text('カメラ'),
               onTap: () {
                 Navigator.pop(context);
-                getCamera();
+                getCamera().then((v){setState(() {
+                  _canShowCameraIcon = false; 
+                });});
               },
             ),
             ListTile(
@@ -198,7 +210,9 @@ class _MyImagePageState extends State<MyImagePage>{
               title: Text('画像'),
               onTap: () {
                 Navigator.pop(context);
-                getImage();
+                getImage().then((v){setState(() {
+                  _canShowCameraIcon = false; 
+                });});
               },
             ),
           ],
@@ -207,7 +221,79 @@ class _MyImagePageState extends State<MyImagePage>{
     );
   }
 
-  void getCamera() async{
+  void _showModalIcon() {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            // 写真追加
+            IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(this.context),
+            ),
+            Expanded(
+              child: Center(
+                child:FlatButton(
+                  child: Text("S",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: pressAttention[0] ?  Colors.blue: Color(0xFF303030),
+                      )
+                  ),
+                  onPressed:() => setState(() => selectArtIcon(0,'start')),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child:FlatButton(
+                  child: Text("G",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: pressAttention[1] ? Colors.blue: Color(0xFF303030),
+                      )
+                  ),
+                onPressed:() => setState(() => selectArtIcon(1,'gole')),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: GestureDetector(
+                  child: RotationTransition(
+                    child: Icon(
+                      Icons.radio_button_unchecked,
+                      color: pressAttention[2] ? Colors.blue: Color(0xFF303030),
+                    ),
+                    turns: new AlwaysStoppedAnimation(135 / 360),
+                  ),
+                  onTap:() => setState(() => selectArtIcon(2,'maru')),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: GestureDetector(
+                  child: RotationTransition(
+                    child: Icon(
+                      Icons.label_outline,
+                      color: pressAttention[3] ? Colors.blue: Color(0xFF303030),
+                    ),
+                    turns: new AlwaysStoppedAnimation(135 / 360),
+                  ),
+                  onTap:() => setState(() => selectArtIcon(3,'label')),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> getCamera() async{
     if(this.imageFile == null){
       File file = await ImagePicker.pickImage(source: ImageSource.camera);
       this.imageFile = file;
@@ -216,7 +302,7 @@ class _MyImagePageState extends State<MyImagePage>{
       ImagePainter.ms(targetimage, marks, imageFile, mediasize).saveImage();
     }
   }
-  void getImage() async{
+  Future<void> getImage() async{
     if(this.imageFile == null){
       File file = await ImagePicker.pickImage(source: ImageSource.gallery);
       this.imageFile = file;
@@ -293,10 +379,12 @@ class _MyImagePageState extends State<MyImagePage>{
     });
   }
 
-  // リセット処理
-  void _onReset(TapUpDetails details){
+  // 一つ前に戻る処理
+  void _onLastRemove(){
     setState(() {
-      marks = List<Mark>();
+      if(marks.length != 0){
+        marks.removeLast();
+      }
     });
   }
 
