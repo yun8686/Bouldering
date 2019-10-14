@@ -1,4 +1,5 @@
 import 'package:bouldering_sns/Library/SharedPreferences.dart';
+import 'package:bouldering_sns/Model/User/User.dart';
 import 'package:bouldering_sns/SplashScreen/SplashWidget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
@@ -18,29 +19,17 @@ class _AuthEntranceState extends State<AuthEntranceWidget> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<FirebaseUser> _handleSignIn() async {
-    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
-
-    final AuthCredential credential = GoogleAuthProvider.getCredential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-
-    final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
-    await MySharedPreferences.setFirebaseUID(user.uid);
-    await Firestore.instance.collection('users').document(user.uid).setData({
-      'uid': user.uid,
-      'email': user.email,
-      'displayName': user.displayName,
+  _AuthEntranceState(){
+    User.getLoginUser().then((User user){
+      if(user != null){
+        // ログイン済の場合はSplashに戻る
+        Navigator.of(context).pushReplacement(new MaterialPageRoute(
+          builder: (BuildContext context) => SplashWidget(),
+        ));
+      }
     });
-
-    Navigator.of(context).pushReplacement(new MaterialPageRoute(
-      builder: (BuildContext context) => SplashWidget(),
-    ));
-    return user;
   }
+
 
   Future<void> _handleSignOut() async {
     _auth.signOut();
@@ -175,7 +164,7 @@ class _AuthEntranceState extends State<AuthEntranceWidget> {
         SignInButton(
           Buttons.Google,
           mini: true,
-          onPressed: () => _handleSignIn(),
+          onPressed: () => _doGoogleLogin(),
         ),
         SizedBox(width: 16),
         SignInButton(
@@ -201,14 +190,55 @@ class _AuthEntranceState extends State<AuthEntranceWidget> {
         child:Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text("アカウントをお持ちではないですか？", style: TextStyle(fontStyle:FontStyle.italic ,fontSize: 20.0, color: Colors.white)),
+            Text("アプリ", style: TextStyle(fontStyle:FontStyle.italic ,fontSize: 20.0, color: Colors.white)),
             GestureDetector(
-              child: Text("新規登録", style: TextStyle(decoration: TextDecoration.underline, fontStyle:FontStyle.italic ,fontSize: 20.0, color: Colors.white)),
-              onTap: (){},
+              child: Text("ログインしないで始める", style: TextStyle(decoration: TextDecoration.underline, fontStyle:FontStyle.italic ,fontSize: 20.0, color: Colors.white)),
+              onTap: (){
+                doAnonymousLogin();
+              },
             ),
           ]
         ),
       )
     );
   }
+
+  Future<void> doAnonymousLogin()async{
+    String uid = (await _auth.signInAnonymously()).user.uid;
+    print(uid);
+    await MySharedPreferences.setFirebaseUID(uid);
+    await Firestore.instance.collection('users').document(uid).setData({
+      'uid': uid,
+      'email': uid,
+      'displayName': uid,
+    });
+
+    MySharedPreferences.setAccountMode(MySharedPreferences.Anonymous);
+  }
+
+  Future<FirebaseUser> _doGoogleLogin() async {
+    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+    final GoogleSignInAuthentication googleAuth =
+    await googleUser.authentication;
+
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
+    await MySharedPreferences.setFirebaseUID(user.uid);
+    await Firestore.instance.collection('users').document(user.uid).setData({
+      'uid': user.uid,
+      'email': user.email,
+      'displayName': user.displayName,
+    });
+
+    MySharedPreferences.setAccountMode(MySharedPreferences.FullUser);
+    Navigator.of(context).pushReplacement(new MaterialPageRoute(
+      builder: (BuildContext context) => SplashWidget(),
+    ));
+    return user;
+  }
+
 }

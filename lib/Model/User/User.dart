@@ -26,6 +26,8 @@ class User{
           displayName: onValue.data['displayName'],
           notifyId: onValue.data['notifyId'],
         );
+      }else{
+        return null;
       }
     });
   }

@@ -4,7 +4,6 @@ import 'package:bouldering_sns/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import '../Library/SharedPreferences.dart';
 
 class SplashWidget extends StatefulWidget {
@@ -19,31 +18,31 @@ class SplashWidget extends StatefulWidget {
 
 class _SplashWidgetState extends State<SplashWidget> {
   Widget afterWidget;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     print("initState");
-    setNotification().then((instance_id){
+    setNotification().then((instance_id)async{
+      String accountMode = await MySharedPreferences.getAccountMode();
+      print("accountMode: " + accountMode);
       print("instance_id: " + instance_id);
-      MySharedPreferences.getFirebaseUID().then((firebaseUID){
-        if(firebaseUID != null){
-          // ログイン済みの場合はMyApp
-          User.getLoginUser().then((User user){
-            user.setNotifyId(instance_id).then((v){
-              Navigator.of(context).pushReplacement(new MaterialPageRoute(
-                builder: (BuildContext context) => MyApp(),
-              ));
-            });
+      if(accountMode == MySharedPreferences.FirstTime){
+        // 未ログインユーザーの場合はログイン画面
+        Navigator.of(context).pushReplacement(new MaterialPageRoute(
+          builder: (BuildContext context) => AuthEntranceWidget(),
+        ));
+      }else{
+        User.getLoginUser().then((User user){
+          user.setNotifyId(instance_id).then((v){
+            Navigator.of(context).pushReplacement(new MaterialPageRoute(
+              builder: (BuildContext context) => MyApp(),
+            ));
           });
-        }else{
-          // 未ログインの場合はAuthEntrance
-          Navigator.of(context).pushReplacement(new MaterialPageRoute(
-            builder: (BuildContext context) => AuthEntranceWidget(),
-          ));
-        }
-      });
+        });
+      }
     });
   }
 

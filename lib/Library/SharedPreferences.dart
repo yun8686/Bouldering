@@ -23,6 +23,27 @@ class MySharedPreferences{
     return prefs.getString(_FIREBASE_UID);
   }
 
+  /*
+    アカウントモード
+      FirstTime: まだ始めていないユーザー
+      Anonymous: ログインしないで始めているユーザー
+      NonVerifyUser:  メールアドレス未認証ユーザー
+      FullUser:  メールアドレス認証済ユーザー
+   */
+  static final String _ACCOUNT_MODE = "ACCOUNT_MODE";
+  static final String FirstTime = "FirstTime";
+  static final String Anonymous = "Anonymous";
+  static final String NonVerifyUser = "NonVerifyUser";
+  static final String FullUser = "FullUser";
+  static Future<bool> setAccountMode(String accountMode)async{
+    await _init();
+    return prefs.setString(_ACCOUNT_MODE, accountMode);
+  }
+  static Future<String> getAccountMode() async{
+    await _init();
+    return prefs.getString(_ACCOUNT_MODE)??FirstTime;
+  }
+
   static Future<bool> setNearGymList(List<Gym> gymList) async{
     List<String> strList = List<String>();
     Database database = await SQLiteDatabase.getDatabase();

@@ -1,6 +1,6 @@
-import 'dart:io';
-
+import 'package:bouldering_sns/Authentication/VerifyModal.dart';
 import 'package:bouldering_sns/Chat/ChatWidget.dart';
+import 'package:bouldering_sns/Library/SharedPreferences.dart';
 import 'package:bouldering_sns/Model/User/User.dart';
 import 'package:flutter/material.dart';
 
@@ -18,26 +18,35 @@ class FriendsWidgetState extends State<FriendsWidget> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    setLoginUser().then((user){
-      setFriendUserList();
-      setNearUserList();
+    MySharedPreferences.getAccountMode().then((mode){
+      if(mode == MySharedPreferences.FullUser){
+        setLoginUser().then((user) {
+          setFriendUserList();
+          setNearUserList();
+        });
+      }else{
+        VerifyModal.openModal(context);
+      }
     });
   }
-  Future<User> setLoginUser(){
-    return User.getLoginUser().then((user){
+
+  Future<User> setLoginUser() {
+    return User.getLoginUser().then((user) {
       this.loginUser = user;
       return user;
     });
   }
-  void setFriendUserList(){
-    User.getFriendUserList(true).then((userList){
+
+  void setFriendUserList() {
+    User.getFriendUserList(true).then((userList) {
       setState(() {
         this.friendUserList = userList;
       });
     });
   }
-  void setNearUserList(){
-    User.nearUserList().then((userList){
+
+  void setNearUserList() {
+    User.nearUserList().then((userList) {
       setState(() {
         this.nearUserList = userList;
       });
@@ -54,8 +63,7 @@ class FriendsWidgetState extends State<FriendsWidget> {
                 actions: <Widget>[
                   IconButton(
                     icon: Icon(Icons.settings),
-                    onPressed: () {
-                    },
+                    onPressed: () {},
                   )
                 ],
                 bottom: TabBar(tabs: <Widget>[
@@ -67,26 +75,22 @@ class FriendsWidgetState extends State<FriendsWidget> {
                 Center(child: Column(children: getFriendsWidgets())),
                 Center(child: Column(children: getNearByWidgets())),
               ],
-            )
-        )
-    );
+            )));
   }
 
-  Widget getSearchArea(){
+  Widget getSearchArea() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: "検索",
-          filled: true,
-          border: InputBorder.none,
-          suffixIcon: IconButton(
-            icon: Icon(Icons.search),
-            onPressed: (){},
-          )
-        ),
-      )
-    );
+        padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+        child: TextField(
+          decoration: InputDecoration(
+              hintText: "検索",
+              filled: true,
+              border: InputBorder.none,
+              suffixIcon: IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () {},
+              )),
+        ));
   }
 
   List<Widget> getFriendsWidgets() {
@@ -95,7 +99,9 @@ class FriendsWidgetState extends State<FriendsWidget> {
     widgets.add(Expanded(
       child: Container(
         child: ListView(
-          children: nearUserList.map((user){return UserTile(user);}).toList(),
+          children: nearUserList.map((user) {
+            return UserTile(user);
+          }).toList(),
         ),
       ),
     ));
@@ -107,17 +113,17 @@ class FriendsWidgetState extends State<FriendsWidget> {
     widgets.add(Expanded(
       child: Container(
           child: RefreshIndicator(
-              onRefresh: (){},
+              onRefresh: () {},
               child: new ListView(
-                children: nearUserList.map((user){return UserTile(user);}).toList(),
-              )
-          )
-      ),
+                children: nearUserList.map((user) {
+                  return UserTile(user);
+                }).toList(),
+              ))),
     ));
     return widgets;
   }
 
-  Widget UserTile(User user){
+  Widget UserTile(User user) {
     return ListTile(
       leading: CircleAvatar(
         backgroundImage: NetworkImage(
@@ -126,11 +132,14 @@ class FriendsWidgetState extends State<FriendsWidget> {
       title: Text(user.displayName),
       onTap: () {
         Navigator.push(
-          context,
-          MaterialPageRoute<Null>(
-            builder: (BuildContext context) => ChatWidget(leftUser: user,rightUser: loginUser),
-          ));
+            context,
+            MaterialPageRoute<Null>(
+              builder: (BuildContext context) =>
+                  ChatWidget(leftUser: user, rightUser: loginUser),
+            ));
       },
     );
   }
+
+
 }
