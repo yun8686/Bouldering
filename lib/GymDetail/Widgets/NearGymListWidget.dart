@@ -33,6 +33,7 @@ class _NearGymListState extends State<NearGymListWidget> {
           case ConnectionState.done:
             if(snapshot.hasData){
               listView = ListView(
+                key: PageStorageKey(1),
                 children: snapshot.data.map((gym) {
                   return listCard(gym);
                 }).toList(),

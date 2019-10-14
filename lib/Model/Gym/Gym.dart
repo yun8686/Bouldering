@@ -59,9 +59,9 @@ class Gym{
    *             falseの場合は、APIから取得してキャッシュに保存する
    */
   static Future<List<Gym>> getNearGymList(bool isCache) async {
-    GeolocationStatus geolocationStatus  = await Geolocator().checkGeolocationPermissionStatus();
-    Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     if(!isCache){
+      GeolocationStatus geolocationStatus  = await Geolocator().checkGeolocationPermissionStatus();
+      Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
       PlacesSearchResponse response = await places.searchByText("ロッククライミングジム", language: "ja", location: Location(position.latitude, position.longitude));
       await Future.wait(response.results.map((data){
         return _findByPlaceId(data.placeId, position);

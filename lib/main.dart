@@ -1,4 +1,5 @@
 import 'package:bouldering_sns/Friends/FriendsWidget.dart';
+import 'package:bouldering_sns/GymDetail/GymListWidget.dart';
 import 'package:bouldering_sns/Home/HomeWidget.dart';
 import 'package:bouldering_sns/camera/camera.dart';
 import 'package:bouldering_sns/Setting/SettingWidget.dart';
@@ -12,6 +13,8 @@ void main() => runApp(
 //        home: MyApp(),
       ),
     );
+
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -66,10 +69,6 @@ class _MyImagePageState extends State<MyImagePage> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
       ),
-      floatingActionButton: _selectedIndex==1?FloatingActionButton(
-        child: Icon(Icons.camera_alt),
-        onPressed: getImage,
-      ):null,
     );
   }
 
@@ -85,6 +84,8 @@ class _MyImagePageState extends State<MyImagePage> {
         return SettingWidget();
       case 2:
         return FriendsWidget();
+      case 1:
+        return GymListWidget();
       case 0:
         return HomeWidget();
     }

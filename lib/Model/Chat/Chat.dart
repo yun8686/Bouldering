@@ -15,10 +15,14 @@ class Chat{
     }else{
       this.key = this.leftUser.key + "_" + this.rightUser.key;
     }
+    List<String> users = List<String>();
+    users.add(this.rightUser.key);
+    users.add(this.leftUser.key);
     collection.document(this.key).get().then((onValue){
       if(!onValue.exists){
         collection.document(this.key).setData({
           'count': 0,
+          'users': users,
         });
       }
     });
