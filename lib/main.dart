@@ -9,12 +9,11 @@ import 'package:flutter/material.dart';
 void main() => runApp(
       MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: SplashWidget(),
-//        home: MyApp(),
+//        home: HomeWidget(),
+        home: MyApp(),
+//        home: SplashWidget(),
       ),
     );
-
-
 
 class MyApp extends StatelessWidget {
   @override

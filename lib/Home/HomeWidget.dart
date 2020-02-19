@@ -1,140 +1,86 @@
-import 'package:bouldering_sns/GymDetail/Widgets/FavoriteGymListWidget.dart';
-import 'package:bouldering_sns/GymDetail/Widgets/NearGymListWidget.dart';
-import 'package:bouldering_sns/GymDetail/Widgets/UserPanelWidget.dart';
 import 'package:flutter/material.dart';
-
-class oldHomeWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: DefaultTabController(
-      length: 2,
-      child: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            SliverAppBar(
-              expandedHeight: 250.0,
-              floating: false,
-              flexibleSpace: FlexibleSpaceBar(
-                  background: Stack(
-                children: <Widget>[
-                  ListView(
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(top: 10.0),
-                        height: 240.0,
-                        child: UserPanelWidget(),
-                      ),
-                    ],
-                  )
-                ],
-              )),
-            ),
-            SliverPersistentHeader(
-              delegate: _SliverAppBarDelegate(
-                TabBar(
-                  tabs: [
-                    Tab(text: "近いジム"),
-                    Tab(text: "お気に入りジム"),
-                  ],
-                ),
-              ),
-              pinned: true,
-            )
-          ];
-        },
-        body: TabBarView(
-          children: <Widget>[
-            NearGymListWidget(key: PageStorageKey(1)),
-            FavoriteGymListWidget(key: PageStorageKey(2)),
-          ],
-        ),
-      ),
-    ));
-  }
-}
-
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  _SliverAppBarDelegate(this._tabBar);
-
-  final TabBar _tabBar;
-
-  @override
-  double get minExtent => _tabBar.preferredSize.height;
-  @override
-  double get maxExtent => _tabBar.preferredSize.height;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: Theme.of(context).primaryColor,
-      child: _tabBar,
-    );
-  }
-
-  @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return false;
-  }
-}
-
-// ここから下が新しいデザイン
 
 class HomeWidget extends StatelessWidget {
   Size size;
   @override
   Widget build(BuildContext context) {
-    size = MediaQuery.of(context).size;
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.pin_drop),
-        onPressed: () {},
-      ),
       appBar: AppBar(
         title: Text("ホーム"),
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              SizedBox(
-                width: size.width * 0.95,
-                height: size.height * 0.5,
-                child: Card(
-                    child: Column(
-                  children: <Widget>[
-                    Text("お気に入り"),
-                  ],
-                )),
+      body: ListView.builder(
+        itemCount: 3,
+        itemBuilder: (BuildContext context, int index) {
+          return _gymCard();
+        },
+      ),
+    );
+  }
+  Widget _gymCard(){
+    print("GymCard");
+    return Center(
+      child: Card(
+        semanticContainer: true,
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        margin:EdgeInsets.all(12.0),
+        elevation: 5,
+        child: Container(
+          width: double.infinity,
+          height: 250,
+          child: Stack(
+            children:<Widget>[
+              Container(
+                width: double.infinity,
+                child: Image.network(
+                  'https://placeimg.com/640/480/any',
+                  fit: BoxFit.fill,
+                ),
               ),
-              SizedBox(
-                  width: size.width * 0.95,
-                  height: size.height * 0.5,
-                  child: Row(children: <Widget>[
-                    Expanded(
-                      child: Card(
-                        child: Column(
-                          children: <Widget>[
-                            Text("自分の投稿"),
-                          ],
-                        ),
+              Align(
+                alignment: Alignment.topLeft,
+                child: Container(
+                  padding: const EdgeInsets.only(left:10.0,top:5.0,),
+                  child: Text(
+                    "ボルコム新宿店",
+                    style: const TextStyle(fontSize: 18,color: Colors.white),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  color: Colors.white,
+                  height: 60,
+                  child: Row(
+                    children: <Widget>[
+                      const SizedBox(width: 8.0,),
+                      CircleAvatar(
+                        backgroundImage: NetworkImage('https://placeimg.com/100/100/any'),
                       ),
-                    ),
-                    Expanded(
-                      child: Card(
-                        child: Column(
-                          children: <Widget>[
-                            Text("自分の投稿"),
-                          ],
+                      const SizedBox(width: 16.0,),
+                      Expanded(child: Text("ボルコム太郎",style: TextStyle(fontSize: 18,),),),
+                      Container(
+                        height: 40,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.red),
+                          borderRadius: BorderRadius.circular(40),
                         ),
+                        child: Center(child:Text("3時間前"),),
                       ),
-                    )
-                  ]))
-            ],
+                      const SizedBox(width: 8.0,),
+                    ],
+                  ),
+                ),
+              ),
+            ]
           ),
         ),
       ),
     );
   }
+  
 }
