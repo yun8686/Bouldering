@@ -5,6 +5,7 @@ import 'package:bouldering_sns/Setting/LocationSettingWidget.dart';
 import 'package:bouldering_sns/Setting/NoticeSettingWidget.dart';
 import 'package:bouldering_sns/Setting/PrivacyPolicyWidget.dart';
 import 'package:bouldering_sns/Setting/TermsOfServiceWidget.dart';
+import 'package:bouldering_sns/camera/camera.dart';
 import 'package:flutter/material.dart';
 
 class SettingWidget extends StatelessWidget {
@@ -32,6 +33,7 @@ class SettingWidget extends StatelessWidget {
       _tile('利用規約', context, new TermsOfServiceWidget()),
       _tile('お問い合わせ', context, new ContactWidget()),
       _tile('プライバシーポリシー', context, new PrivacyPolicyWidget()),
+      _tile('カメラテスト', context, new CameraWidget()),
     ],
   );
 
