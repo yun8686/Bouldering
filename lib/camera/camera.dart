@@ -45,6 +45,11 @@ class _MyImagePageState extends State<MyImagePage>{
 
   @override
   Widget build(BuildContext context) {
+    AppBar appBar = AppBar(
+    title: Text('Demo'),
+    );
+    double appBarHeight = appBar.preferredSize.height;
+    print(appBarHeight);
     mediasize = MediaQuery.of(context).size;
     return Scaffold(
       body: 
@@ -55,77 +60,87 @@ class _MyImagePageState extends State<MyImagePage>{
             child:Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Container(
-                  height: 40,
-                  decoration: new BoxDecoration(
-                    color: Colors.grey,
-                  ),
-                  child:Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      // 戻るアイコン
-                      SizedBox(
-                        height: 40,
-                        width: MediaQuery.of(context).size.width * 0.2,
-                        child: IconButton(
-                          color: Colors.grey,
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: Colors.black,
-                          ),
-                          onPressed: () => Navigator.pop(this.context),
+                AppBar(
+                  title: const Text('課題作成'),
+                  backgroundColor: Colors.grey,
+                  centerTitle: true,
+                ),
+                Expanded(
+                  // 写真表示箇所
+                  child: GestureDetector(
+                    onTapUp: _onTapUp,
+                    onLongPressStart: _onLongPressStart,
+                    onLongPressMoveUpdate: _onPointerMove,
+                    onLongPressEnd: _onLongPressEnd,
+                    onScaleUpdate: _onScaleUpdate,
+                    onScaleEnd: _onScaleEnd,
+                    onScaleStart: _onScaleStart,
+                    child:SafeArea(
+                      child: Container(
+                        child: CustomPaint(
+                          key: _canvasKey,
+                          painter: ImagePainter(targetimage, marks, imageFile),
                         ),
+                        color: Colors.grey,
+                        // height: mediasize.height - appBarHeight - 64,
+                        width: mediasize.width,
                       ),
-                      // 余白の分
-                      SizedBox(
-                        height: 40,
-                        width: MediaQuery.of(context).size.width * 0.4,
-                      ),
-                      // スタンプを開くアイコン
-                      SizedBox(
-                        height: 40,
-                        width: MediaQuery.of(context).size.width * 0.2,
-                        child: IconButton(
-                          color: Colors.grey,
-                          icon: Icon(
-                            Icons.tag_faces,
-                            color: Colors.white),
-                          onPressed: () => _showModalIcon(),
-                        ),
-                      ),
-                      // 完了するボタン
-                      SizedBox(
-                        height: 40,
-                        width: MediaQuery.of(context).size.width * 0.2,
-                        child: IconButton(
-                          color: Colors.grey,
-                          icon: Icon(
-                            Icons.done,
-                            color: Colors.white),
-                          onPressed: () => _onSave,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
-                // 写真表示箇所
-                GestureDetector(
-                  onTapUp: _onTapUp,
-                  onLongPressStart: _onLongPressStart,
-                  onLongPressMoveUpdate: _onPointerMove,
-                  onLongPressEnd: _onLongPressEnd,
-                  onScaleUpdate: _onScaleUpdate,
-                  onScaleEnd: _onScaleEnd,
-                  onScaleStart: _onScaleStart,
-                  child:SafeArea(
-                    child: Container(
-                      child: CustomPaint(
-                        key: _canvasKey,
-                        painter: ImagePainter(targetimage, marks, imageFile),
-                      ),
+                // フッター箇所
+                Container(
+                  height: 64,
+                  child: Container(
+                    decoration: new BoxDecoration(
                       color: Colors.grey,
-                      height: mediasize.height - 64,
-                      width: mediasize.width,
+                    ),
+                    child:Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        // 戻るアイコン
+                        SizedBox(
+                          height: 40,
+                          width: MediaQuery.of(context).size.width * 0.2,
+                          child: IconButton(
+                            color: Colors.grey,
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.black,
+                            ),
+                            onPressed: () => Navigator.pop(this.context),
+                          ),
+                        ),
+                        // 余白の分
+                        SizedBox(
+                          height: 40,
+                          width: mediasize.width * 0.4,
+                        ),
+                        // スタンプを開くアイコン
+                        SizedBox(
+                          height: 40,
+                          width: mediasize.width * 0.2,
+                          child: IconButton(
+                            color: Colors.grey,
+                            icon: Icon(
+                              Icons.delete_forever,
+                              color: Colors.white),
+                            onPressed: () => print('delete'),//_showModalIcon(),
+                          ),
+                        ),
+                        // 完了するボタン
+                        SizedBox(
+                          height: 40,
+                          width: mediasize.width * 0.2,
+                          child: IconButton(
+                            color: Colors.grey,
+                            icon: Icon(
+                              Icons.done,
+                              color: Colors.white),
+                            onPressed: () => _onSave,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -135,8 +150,8 @@ class _MyImagePageState extends State<MyImagePage>{
         ),
         // カメラアイコン
         Positioned(
-          left: MediaQuery.of(context).size.width * 0.5 - 32,
-          top: MediaQuery.of(context).size.height * 0.5 - 30,
+          left: mediasize.width * 0.5 - 32,
+          top: mediasize.height * 0.5 - 30,
           child: _canShowCameraIcon
             ? IconButton(
             color: Colors.grey,
@@ -148,33 +163,88 @@ class _MyImagePageState extends State<MyImagePage>{
             onPressed: () => _showModalSelectImage(),
           ) : SizedBox(),
         ),
-        // 一つ戻るアイコン
-        Positioned(
-          left: 30,
-          bottom: 20,
-          child: IconButton(
-            color: Colors.grey,
-            icon: Icon(
-              Icons.replay,
-              color: Colors.black,
-              size: 30
-            ),
-            onPressed: () => _onLastRemove(),
-          ),
-        ),
-        // 保存するアイコン
-        Positioned(
-          right: 30,
-          bottom: 20,
-          child: IconButton(
-            color: Colors.black,
-            icon: Icon(
-              Icons.done,
-              color: Colors.black,
-              size: 30
-            ),
-            onPressed: () => _onSave,
-          ),
+        // スタンプ設定箇所
+        Positioned.fill(
+          top: mediasize.height - 174,
+          child:Row(
+            children: <Widget>[
+              // 写真追加
+              Expanded(
+                child: RawMaterialButton(
+                  child: Icon(
+                    Icons.replay,
+                    color: Colors.black,
+                    size: 30
+                  ),
+                  shape: new CircleBorder(),
+                  fillColor: Colors.white,
+                  onPressed: () => _onLastRemove(),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child:RawMaterialButton(
+                    child: Text("S",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: pressAttention[0] ?  Colors.blue: Color(0xFF303030),
+                        )
+                    ),
+                    shape: new CircleBorder(),
+                    fillColor: Colors.white,
+                    onPressed:() => setState(() => selectArtIcon(0,'start')),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child:RawMaterialButton(
+                    child: Text("G",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: pressAttention[1] ? Colors.blue: Color(0xFF303030),
+                        )
+                    ),
+                  shape: new CircleBorder(),
+                  fillColor: Colors.white,
+                  onPressed:() => setState(() => selectArtIcon(1,'gole')),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: RawMaterialButton(
+                    child: RotationTransition(
+                      child: Icon(
+                        Icons.radio_button_unchecked,
+                        color: pressAttention[2] ? Colors.blue: Color(0xFF303030),
+                      ),
+                      turns: new AlwaysStoppedAnimation(135 / 360),
+                    ),
+                    shape: new CircleBorder(),
+                    fillColor: Colors.white,
+                    onPressed:() => setState(() => selectArtIcon(2,'maru')),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: RawMaterialButton(
+                    child: RotationTransition(
+                      child: Icon(
+                        Icons.label,
+                        color: pressAttention[3] ? Colors.blue: Color(0xFF303030),
+                      ),
+                      turns: new AlwaysStoppedAnimation(135 / 360),
+                    ),
+                    shape: new CircleBorder(),
+                    fillColor: Colors.white,
+                    onPressed:() => setState(() => selectArtIcon(3,'label')),
+                  ),
+                ),
+              ),
+            ],
+          )
         ),
       ]),
     );
@@ -401,11 +471,25 @@ class _MyImagePageState extends State<MyImagePage>{
   // アイコンの大きさを変更する処理
   double basescale = 1;
   void _onScaleUpdate(ScaleUpdateDetails details) {
-    setState(() {
-      nowMark.scale = details.scale*basescale;
-      print(nowMark);
-      // nowMark.fontSize = details.fontSize
-    });
+    // List<Mark> marks;
+    print('List<Mark> marks');
+    print(marks);
+    print(marks.length > 0);
+    if(marks.length > 0){
+      setState(() {
+        nowMark.scale = details.scale*basescale;
+        print(nowMark);
+        // nowMark.fontSize = details.fontSize
+      });
+    }
+    else{
+      setState(() {
+        // ここに画像を入れる
+        print(targetimage);
+        print(this.imageFile);
+        // Img.copyResize(targetimage, 800);
+      });
+    }
   }
   void _onScaleEnd(ScaleEndDetails details){
 
@@ -489,6 +573,7 @@ class Mark {
       fontFamily: icon.fontFamily,
       fontSize: 2 * this.scale,
     ))
+      ..pushStyle(new ui.TextStyle(color: Colors.blue))
       ..addText(String.fromCharCode(icon.codePoint));
     var para = builder.build();
     para.layout(const ui.ParagraphConstraints(width: 60));
