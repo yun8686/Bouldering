@@ -16,28 +16,55 @@ class GymCard{
           elevation: 5,
           child: Container(
             width: double.infinity,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                fit: BoxFit.fill,
+                image: NetworkImage('http://via.placeholder.com/1x1'),
+              ),
+            ),
             height: 250,
             child: Stack(children: <Widget>[
               Container(
-                width: double.infinity,
-                child: Image.network(
-                  'https://placeimg.com/640/480/any',
-                  fit: BoxFit.fill,
-                ),
-              ),
+                decoration: bwGradation,
+                child: 
               Align(
                 alignment: Alignment.topLeft,
-                child: Container(
-                  padding: const EdgeInsets.only(
-                    left: 10.0,
-                    top: 5.0,
-                  ),
-                  child: Text(
-                    "ボルコム新宿店",
-                    style: const TextStyle(fontSize: 18, color: Colors.white),
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.only(
+                        left: 10.0,
+                        top: 5.0,
+                      ),
+                      child: Text(
+                        "ボルコム新宿店",
+                        style: const TextStyle(fontSize: 18, color: Colors.white),
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      child: Row(
+                      children: <Widget>[
+                        Container(
+                          height: 30,
+                          width: 30,
+                          margin: EdgeInsets.all(8),
+                          child: Image.asset('assets/level_icons/w90.png'),
+                        ),
+                        Container(
+                          height: 30,
+                          width: 30,
+                          margin: EdgeInsets.all(8),
+                          child: Image.asset('assets/level_icons/w90.png'),
+                        ),
+                      ],
+                    ),
+                    ),
+                  ],
                 ),
-              ),
+              ),),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
@@ -87,4 +114,19 @@ class GymCard{
       ),
     );
   }
+
+  static BoxDecoration bwGradation = BoxDecoration(
+    gradient: LinearGradient(
+      begin: FractionalOffset.topCenter,
+      end: FractionalOffset.bottomCenter,
+      colors: [
+        Colors.black.withOpacity(0.9),
+        Colors.black.withOpacity(0.0),
+      ],
+      stops: const [
+        0.0,
+        0.3,
+      ],
+    ),
+  );
 }

@@ -1,131 +1,93 @@
-import 'package:bouldering_sns/Model/Gym/Problem.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:meta/meta.dart';
 
 class ProblemMakeWidget extends StatefulWidget {
-  String gymId, gradeId;
-
-  ProblemMakeWidget({@required this.gymId, @required this.gradeId});
+  ProblemMakeWidget();
   @override
   State<StatefulWidget> createState() {
-    return _ProblemMakeWidgetState(gymId: gymId, gradeId: gradeId);
+    return _ProblemMakeWidgetState();
   }
 }
-class _ProblemMakeWidgetState extends State<ProblemMakeWidget>{
+
+class _ProblemMakeWidgetState extends State<ProblemMakeWidget> {
   String title = "", comment = "";
 
-  String gymId, gradeId;
-  _ProblemMakeWidgetState({this.gymId, this.gradeId});
+  _ProblemMakeWidgetState();
   @override
   Widget build(BuildContext context) {
     print("build");
-    return  SafeArea(
-        child: Scaffold(
-            appBar: AppBar(
-              title: Text("課題登録"),
-              actions: <Widget>[
-                FlatButton(
-                  textColor: Colors.white,
-                  onPressed: () {
-                    if(true){
-                      print("ok");
-                      Problem(title: this.title, comment: comment, gym: gymId).create();
-                    }else{
-                      print("ng");
-                    }
-                  },
-                  child: Text("次へ"),
-                  shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("課題作成"),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              GestureDetector(
+                onTap: (){
+                  print("tap");
+                },
+                child: Container(
+                  color: Colors.grey,
+                  width: double.infinity,
+                  height: 400,
+                  child: Icon(Icons.camera_alt,size: 60,color: Colors.white,),
                 ),
-              ],
-            ),
-            body: (
-                //key: _formKey,child:
-                Container(
-                  padding: EdgeInsets.all(4.0),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Image(image: AssetImage('assets/backgroundimages/login.jpg'), width: 80.0, height:80.0),
-                          Expanded(
-                              child: TextField(
-                                decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText: '課題'
-                                ),
-                                onChanged: (value){
-                                  title = value;
-                                },
-                              )
-                          )
-                        ],
-                      ),
-                      Wrap(
-                        spacing: 8.0,
-                        children: <Widget>[
-                          Chip(
-                            label: Text('カチ'),
-                          ),
-                          Chip(
-                            label: Text('スラブ'),
-                          ),
-                          Chip(
-                            label: Text('足自由'),
-                          )
-                        ],
-                      ),
-                      _scrollableTextField(
-                        onChanged: (value){
-                          this.comment = value.replaceAll(RegExp(r'[\n\r]'), "\\n");
-                          print("trom " + this.comment + " trom");
-                        },
-                      ),
-                    ],
-                  ),
-                )))
-    );
-  }
-}
-
-
-
-class _scrollableTextField extends StatefulWidget {
-  Function(String) onChanged;
-  _scrollableTextField({this.onChanged});
-
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    return _scrollableTextFieldState(onChanged: this.onChanged);
-  }
-}
-class _scrollableTextFieldState extends State<_scrollableTextField>{
-  Function(String) onChanged;
-  _scrollableTextFieldState({this.onChanged});
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(child:ListView(
-      children: [
-        Container(
-          margin: const EdgeInsets.all(10.0),
-          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-          decoration: BoxDecoration(
-              border: Border.all(color: Colors.black),
-              borderRadius: BorderRadius.all(Radius.circular(5.0))),
-          child: TextField(
-            decoration: InputDecoration(border: InputBorder.none, hintText: "コメントを入力"),
-            //テキストフォーム下の下線
-            keyboardType: TextInputType.multiline,
-            minLines: 3,
-            maxLines: null,
-            textAlign: TextAlign.left,
-            onChanged: this.onChanged,
+              ),
+              TextField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "課題のタイトル",
+                ),
+              ),   
+              Text("課題中の要素"),
+              Container(
+                height: 60.0,
+                child:ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: 5,
+                itemBuilder: (BuildContext context, int index){
+                  return Container(
+                    height: 40,
+                    width: 40,
+                    margin: EdgeInsets.all(8),
+                    child: Image.asset('assets/level_icons/90.png'),
+                  );
+                })
+              ),
+              Container(
+                height: 20.0,
+                child:ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: 2,
+                itemBuilder: (BuildContext context, int index){
+                  return Container(
+                    margin: EdgeInsets.only(left: 4),
+                    height: 10,
+                    width: 80,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    child: Center(
+                      child: Text(index==0?"足自由":"カンテ", style: TextStyle(color: Colors.white,fontSize: 12),),
+                    ),
+                  );
+                })
+              ),
+              SizedBox(height: 24.0,),
+              TextField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "コメント",
+                ),
+              ),   
+            ],
           ),
         ),
-      ],
-    ));
+      )
+    );
   }
 }

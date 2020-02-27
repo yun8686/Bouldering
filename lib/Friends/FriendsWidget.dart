@@ -25,7 +25,7 @@ class FriendsWidgetState extends State<FriendsWidget> {
           setNearUserList();
         });
       }else{
-        VerifyModal.openModal(context);
+        //VerifyModal.openModal(context);
       }
     });
   }
