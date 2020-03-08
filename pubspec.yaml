@@ -25,6 +25,8 @@ dependencies:
   permission_handler: any
   geolocator: any
   google_maps_webservice: any
+  google_maps_flutter: any
+  location: any
   url_launcher: any
   firebase_core: any
   firebase_storage: any
