@@ -1,5 +1,6 @@
 
 import 'package:bouldering_sns/GymDetail/ProblemMakeWidget.dart';
+import 'package:bouldering_sns/Profile/ProfileWidget.dart';
 import 'package:bouldering_sns/Setting/ContactWidget.dart';
 import 'package:bouldering_sns/Setting/HowToUseWidget.dart';
 import 'package:bouldering_sns/Setting/LocationSettingWidget.dart';
@@ -37,6 +38,7 @@ class SettingWidget extends StatelessWidget {
       Divider(),
       _tile('カメラテスト', context, new CameraWidget()),
       _tile('課題投稿画面テスト', context, new ProblemMakeWidget()),
+      _tile('プロフィールテスト', context, new ProfileWidget()),
     ],
   );
 

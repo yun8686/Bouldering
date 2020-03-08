@@ -96,7 +96,7 @@ class _GymDetailWidgetState extends State<GymDetailWidget>
                           )
                         );
                       }else {
-                        return _textLable("6級");
+                        return _textLabel("6級");
                       }
                     }
                   ),
@@ -174,12 +174,12 @@ class _GymDetailWidgetState extends State<GymDetailWidget>
           itemCount: 10,
           itemBuilder: (BuildContext context, int index){
             return Container(
-              height: 60,
-              width: 60,
-              margin: EdgeInsets.all(8),
+              height: 80,
+              width: 80,
+              padding: EdgeInsets.all(5),
               child: CircleAvatar(
-                radius: 40.0,
-                backgroundImage: NetworkImage('https://placeimg.com/100/100/any'),
+                radius: 30.0,
+                backgroundImage: NetworkImage('https://placeimg.com/200/200/any'),
               ),
             );
           },
@@ -189,7 +189,7 @@ class _GymDetailWidgetState extends State<GymDetailWidget>
   }
 
   // 課題の一覧
-  Widget _textLable(String text){
+  Widget _textLabel(String text){
     return Container(
       height: 20,
       width: 70,
