@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'dart:typed_data';
 
@@ -24,12 +25,11 @@ class CameraWidget extends StatelessWidget {
 
 class MyImagePage extends StatefulWidget {
   BuildContext context;
-  var onPanStart;
-  var onPanUpdate;
-  var onPanEnd;
-  var onScaleStart = true;
-  var onScaleUpdate = true;
-  var onScaleEnd = true;
+  // onScaleStart、onScaleUpdate、onScaleEnd
+  // 上記のイベントと競合するため、イベントを止めれるように変数でON/OFFを管理出来るように設定
+  var onPanStart = true;
+  var onPanUpdate = true;
+  var onPanEnd = true;
   MyImagePage({this.context});
 
   @override
@@ -49,12 +49,11 @@ class _MyImagePageState extends State<MyImagePage> {
   var _canShowCameraIcon = true;
   // テストコード
   int radius = 250;
-
+  // 拡大/縮小
+  double _scaleValue = 20;
+  //　回転
+  double _rotateValue = 0;
   GlobalKey _canvasKey = GlobalKey();
-
-  // タップしている位置を取得する
-  // Offset _tapPosition;
-  void _onPanUpdate(DragUpdateDetails details) {}
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +73,6 @@ class _MyImagePageState extends State<MyImagePage> {
                 Expanded(
                   // 写真表示箇所
                   child: GestureDetector(
-                    onTapDown: _onTapDown,
                     onTapUp: _onTapUp,
                     onPanStart: widget.onPanStart == null
                         ? null
@@ -91,21 +89,6 @@ class _MyImagePageState extends State<MyImagePage> {
                         : (DragEndDetails details) {
                             _onPanEnd(details);
                           },
-                    onScaleStart: widget.onScaleStart == null
-                        ? null
-                        : (ScaleStartDetails details) {
-                            _onScaleStart(details);
-                          },
-                    onScaleUpdate: widget.onScaleUpdate == null
-                        ? null
-                        : (ScaleUpdateDetails details) {
-                            _onScaleUpdate(details);
-                          },
-                    onScaleEnd: widget.onScaleEnd == null
-                        ? null
-                        : (ScaleEndDetails details) {
-                            _onScaleEnd(details);
-                          },
                     child: SafeArea(
                       child: Container(
                         child: CustomPaint(
@@ -118,6 +101,52 @@ class _MyImagePageState extends State<MyImagePage> {
                       ),
                     ),
                   ),
+                ),
+                Container(
+                  color: Colors.grey,
+                  child: Row(children: <Widget>[
+                    Expanded(
+                      flex: 1,
+                      child: Icon(
+                        Icons.zoom_in,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 9,
+                      child: Slider(
+                        min: 4,
+                        max: 180,
+                        value: _scaleValue,
+                        activeColor: Colors.orange,
+                        inactiveColor: Colors.blueAccent,
+                        onChanged: _changeScale,
+                      ),
+                    ),
+                  ]),
+                ),
+                Container(
+                  color: Colors.grey,
+                  child: Row(children: <Widget>[
+                    Expanded(
+                      flex: 1,
+                      child: Icon(
+                        Icons.loop,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 9,
+                      child: Slider(
+                        min: -180,
+                        max: 180,
+                        value: _rotateValue,
+                        activeColor: Colors.red,
+                        inactiveColor: Colors.blueAccent,
+                        onChanged: _changeRotate,
+                      ),
+                    ),
+                  ]),
                 ),
                 // フッター箇所
                 Container(
@@ -190,7 +219,7 @@ class _MyImagePageState extends State<MyImagePage> {
         ),
         // スタンプ設定箇所
         Positioned.fill(
-            top: mediasize.height - 174,
+            top: mediasize.height - 174 * 2,
             child: Row(
               children: <Widget>[
                 // 写真追加
@@ -397,17 +426,17 @@ class _MyImagePageState extends State<MyImagePage> {
   List<Mark> marks = new List<Mark>();
   var onPanUpdateFlag = false;
 
-  void _onTapDown(TapDownDetails details) {}
-
   // タップが離れたときの処理
   void _onTapUp(TapUpDetails details) {
     RenderBox referenceBox = _canvasKey.currentContext.findRenderObject();
+    // nowMark(Offset,size,mark-kind,rotation)
     nowMark = new Mark(
         // アイコンの初期値分表示箇所をずらす処理
         referenceBox.globalToLocal(Offset(
             details.globalPosition.dx - 20, details.globalPosition.dy - 20)),
         20,
-        selectMark);
+        selectMark,
+        0);
     setState(() {
       marks.add(nowMark);
     });
@@ -440,7 +469,7 @@ class _MyImagePageState extends State<MyImagePage> {
     }
     setState(() {
       onPanUpdateFlag = true;
-      //対象のアイコンがある場合は大きくする処理
+      //対象のアイコンがある��合は大きくする処理
     });
   }
 
@@ -459,12 +488,11 @@ class _MyImagePageState extends State<MyImagePage> {
     }
 
     setState(() {
-      // ��素を移動させる処理
+      //選択したアイコンを動かす
       nowMark.offset = touchPostion;
     });
   }
 
-  // Panイベン��を終���したとき
   void _onPanEnd(DragEndDetails details) {
     setState(() {
       onPanUpdateFlag = false;
@@ -472,7 +500,28 @@ class _MyImagePageState extends State<MyImagePage> {
     if (nowMark == null && marks.length > 0) {
       nowMark = marks[marks.length - 1];
     }
-    this._changeScaleEvent();
+  }
+
+  // 拡大縮小
+  void _changeScale(double e) {
+    print(nowMark);
+    if (nowMark != null && marks.length > 0) {
+      setState(() {
+        nowMark.scale = e;
+        _scaleValue = e;
+      });
+    }
+  }
+
+  // 回転処理
+  void _changeRotate(double e) {
+    print(nowMark);
+    if (nowMark != null && marks.length > 0) {
+      setState(() {
+        nowMark.rotation = e;
+        _rotateValue = e;
+      });
+    }
   }
 
   // 一つ前に戻る削除処理
@@ -494,63 +543,29 @@ class _MyImagePageState extends State<MyImagePage> {
     // data.buffer.asUint8List();
   }
 
-  // アイコンの大きさを変更する処理
-  double basescale = 1;
-  void _onScaleUpdate(ScaleUpdateDetails details) {
-    if (details.scale == 1) {
-      this._changePanEvent();
-    } else {
-      this._changeScaleEvent();
-    }
-    if (marks.length > 0) {
-      setState(() {
-        nowMark.scale = details.scale * basescale;
-      });
-    } else {
-      setState(() {
-        // ここに画像を入れる
-        // print(targetimage);
-        // print(this.imageFile);
-        // Img.copyResize(targetimage, 800);
-      });
-    }
-  }
-
-  void _onScaleStart(ScaleStartDetails details) {
-    print('_onScaleStart');
-    basescale = nowMark.scale;
-  }
-
-  void _onScaleEnd(ScaleEndDetails details) {
-    this._changePanEvent();
-  }
-
   // PanイベントとScaleイベントを両立させるために対応
   void _changePanEvent() {
     widget.onPanUpdate = true;
     widget.onPanStart = true;
     widget.onPanEnd = true;
-    widget.onScaleStart = null;
-    widget.onScaleUpdate = null;
-    widget.onScaleEnd = null;
   }
 
   void _changeScaleEvent() {
     widget.onPanUpdate = null;
     widget.onPanStart = null;
     widget.onPanEnd = null;
-    widget.onScaleStart = true;
-    widget.onScaleUpdate = true;
-    widget.onScaleEnd = true;
   }
 }
+
+Size canvasSize;
 
 class Mark {
   Offset offset;
   double scale;
   String selectMark;
+  double rotation;
 
-  Mark(this.offset, this.scale, this.selectMark);
+  Mark(this.offset, this.scale, this.selectMark, this.rotation);
 
   void drawToCanvas(Canvas canvas) {
     if (this.selectMark == 'maru') {
@@ -596,13 +611,12 @@ class Mark {
   }
 
   void drawG(Canvas canvas) {
-    var textStyle = TextStyle(
-      color: Colors.blue,
-      fontSize: 2 * this.scale,
-    );
     var textSpan = TextSpan(
       text: 'G',
-      style: textStyle,
+      style: TextStyle(
+        color: Colors.blue,
+        fontSize: 2 * this.scale,
+      ),
     );
     var textPainter = TextPainter(
       text: textSpan,
@@ -625,7 +639,23 @@ class Mark {
       ..addText(String.fromCharCode(icon.codePoint));
     var para = builder.build();
     para.layout(const ui.ParagraphConstraints(width: 60));
+
+    // rotate the canvas
+    canvas.save();
+    var rotateWidth = (canvasSize.width) / 2 -
+        (canvasSize.width / 2 - this.offset.dx) +
+        para.width / 2;
+    var rotateHeight = (canvasSize.height) / 2 -
+        (canvasSize.height / 2 - this.offset.dy) +
+        para.height / 2;
+
+    canvas.translate(rotateWidth, rotateHeight);
+    final degrees = this.rotation;
+    final radians = degrees * math.pi / 180;
+    canvas.rotate(radians);
+    canvas.translate(-1 * rotateWidth, -1 * rotateHeight);
     canvas.drawParagraph(para, this.offset);
+    canvas.restore();
   }
 }
 
@@ -640,6 +670,7 @@ class ImagePainter extends CustomPainter {
   @override
   void paint(ui.Canvas canvas, ui.Size size) {
     this.mediaSize = size;
+    canvasSize = this.mediaSize;
     drawToCanvas(canvas);
   }
 
